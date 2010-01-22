@@ -1,0 +1,278 @@
+-------------------------------------------------------------------------------
+-- Localized Lua globals.
+-------------------------------------------------------------------------------
+local _G = getfenv(0)
+
+local string = _G.string
+local math = _G.math
+local pairs = _G.pairs
+
+-------------------------------------------------------------------------------
+-- Addon namespace.
+-------------------------------------------------------------------------------
+local LibStub		= _G.LibStub
+
+local ADDON_NAME	= ...
+local Spamalyzer	= LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceEvent-3.0")
+
+local LQT		= LibStub("LibQTip-1.0")
+local LDB		= LibStub("LibDataBroker-1.1")
+local LDBIcon		= LibStub("LibDBIcon-1.0")
+local L			= LibStub("AceLocale-3.0"):GetLocale(ADDON_NAME)
+
+local db
+local data_obj
+local tooltip
+
+-------------------------------------------------------------------------------
+-- Constants.
+-------------------------------------------------------------------------------
+local defaults = {
+	global = {
+		datafeed = {
+			display		= 1,	-- Message count
+			minimap_icon	= {
+				hide	= false,
+			},
+		},
+		general = {
+			display_frame	= 1,	-- None
+			rename_prefix	= true,
+		},
+		tracking = {
+			battleground	= false,
+			guild		= false,
+			party		= true,
+			raid		= true,
+			whisper		= true,
+		},
+		tooltip = {
+			hide_hint	= false,
+			scale		= 1,
+			sorting		= 1,	-- Name
+			timer		= 0.25,
+		},
+	}
+}
+
+local TRACKING_CHECKS = {
+	["BATTLEGROUND"]	= function() return db.track.battleground end,
+	["GUILD"]		= function() return db.track.guild end,
+	["PARTY"]		= function() return db.track.party end,
+	["RAID"]		= function() return db.track.raid end,
+	["WHISPER"]		= function() return db.track.whisper end,
+}
+
+local MY_NAME		= UnitName("player")
+
+local COLOR_GREEN	= "|cff00ff00"
+local COLOR_GREY	= "|cffcccccc"
+local COLOR_ORANGE	= "|cffeda55f"
+local COLOR_PALE_GREEN	= "|cffa3feba"
+local COLOR_PINK	= "|cffffbbbb"
+local COLOR_RED		= "|cffff0000"
+local COLOR_WHITE	= "|cffffffff"
+local COLOR_YELLOW	= "|cffffff00"
+
+-------------------------------------------------------------------------------
+-- Variables.
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+-- Helper functions.
+-------------------------------------------------------------------------------
+function Spamalyzer:SendAddonMessage(prefix, message, type, target)
+end
+
+function Spamalyzer:AddMessage(prefix, message, type, target, name)
+end
+
+-------------------------------------------------------------------------------
+-- Tooltip and Databroker methods.
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+-- Event functions.
+-------------------------------------------------------------------------------
+function Spamalyzer:OnInitialize()
+	local temp_db = LibStub("AceDB-3.0"):New(ADDON_NAME.."DB", defaults)
+	db = temp_db.global
+
+	self:SetupOptions()
+end
+
+function Spamalyzer:OnEnable()
+	data_obj = LDB:NewDataObject(ADDON_NAME, {
+		type	= "data source",
+		label	= ADDON_NAME,
+		text	= " ",
+		icon	= "Interface\\Icons\\INV_Letter_16",
+	})
+	self:RegisterEvent("CHAT_MSG_ADDON", self.AddMessage)
+
+	if LDBIcon then
+		LDBIcon:Register(ADDON_NAME, data_obj, db.datafeed.minimap_icon)
+	end
+end
+
+function Spamalyzer:OnDisable()
+end
+
+function Spamalyzer:CHAT_MSG_ADDON()
+end
+
+-------------------------------------------------------------------------------
+-- Configuration.
+-------------------------------------------------------------------------------
+local options
+
+local function GetOptions()
+	if not options then
+		options = {
+			name = ADDON_NAME,
+			childGroups = "tab",
+			type = "group",
+			args = {
+				-------------------------------------------------------------------------------
+				-- Datafeed options.
+				-------------------------------------------------------------------------------
+				datafeed = {
+					name	= L["Datafeed"],
+					order	= 10,
+					type	= "group",
+					args	= {
+						display = {
+							order	= 10,
+							type	= "select",
+							name	= _G.DISPLAY_LABEL,
+							desc	= "",
+							get	= function() return db.datafeed.display end,
+							set	= function(info, value) db.datafeed.display = value end,
+							values	= {
+								[1]	= L["Messages"],
+								[2]	= L["Bytes"],
+							},
+
+						},
+						minimap_icon = {
+							order	= 20,
+							type	= "toggle",
+							width	= "full",
+							name	= L["Minimap Icon"],
+							desc	= L["Draws the icon on the minimap."],
+							get	= function()
+									  return not db.datafeed.minimap_icon.hide
+								  end,
+							set	= function(info, value)
+									  db.datafeed.minimap_icon.hide = not value
+
+									  LDBIcon[value and "Show" or "Hide"](LDBIcon, ADDON_NAME)
+								  end,
+						},
+					}
+				},
+				-------------------------------------------------------------------------------
+				-- General options.
+				-------------------------------------------------------------------------------
+				general = {
+					name	= _G.GENERAL_LABEL,
+					order	= 20,
+					type	= "group",
+					args	= {
+						display_frame = {
+							order	= 20,
+							type	= "select",
+							name	= _G.DISPLAY_OPTIONS,
+							desc	= L["Secondary location to display AddOn messages."],
+							get	= function() return db.general.display_frame end,
+							set	= function(info, value) db.general.display_frame = value end,
+							values	= {
+								[1]	= _G.NONE,
+								[2]	= L["ChatFrame1"],
+								[3]	= L["ChatFrame2"],
+								[4]	= L["ChatFrame3"],
+								[5]	= L["ChatFrame4"],
+								[6]	= L["ChatFrame5"],
+								[7]	= L["ChatFrame6"],
+								[8]	= L["ChatFrame7"],
+							},
+						},
+					},
+				},
+				-------------------------------------------------------------------------------
+				-- Tooltip options.
+				-------------------------------------------------------------------------------
+				tooltip = {
+					name = L["Tooltip"],
+					order = 30,
+					type = "group",
+					args = {
+						scale = {
+							order	= 10,
+							type	= "range",
+							width	= "full",
+							name	= L["Scale"],
+							desc	= L["Move the slider to adjust the scale of the tooltip."],
+							min	= 0.5,
+							max	= 1.5,
+							step	= 0.01,
+							get	= function()
+									  return db.tooltip.scale
+								  end,
+							set	= function(info, value)
+									  db.tooltip.scale = math.max(0.5, math.min(1.5, value))
+								  end,
+						},
+						timer = {
+							order	= 20,
+							type	= "range",
+							width	= "full",
+							name	= L["Timer"],
+							desc	= L["Move the slider to adjust the tooltip fade time."],
+							min	= 0.1,
+							max	= 2,
+							step	= 0.01,
+							get	= function()
+									  return db.tooltip.timer
+								  end,
+							set	= function(info, value)
+									  db.tooltip.timer = math.max(0.1, math.min(2, value))
+								  end,
+						},
+						hide_hint = {
+							order	= 30,
+							type	= "toggle",
+							name	= L["Hide Hint Text"],
+							desc	= L["Hides the hint text at the bottom of the tooltip."],
+							get	= function()
+									  return db.tooltip.hide_hint
+								  end,
+							set	= function(info, value)
+									  db.tooltip.hide_hint = value
+								  end,
+						},
+						sorting	= {
+							order	= 40,
+							type	= "select",
+							name	= L["Sort By"],
+							desc	= L["Method to use when sorting entries in the tooltip."],
+							get	= function() return db.tooltip.sorting end,
+							set	= function(info, value) db.tooltip.sorting = value end,
+							values	= {
+								[1]	= L["Name"],
+								[2]	= L["Bytes"],
+								[3]	= L["Messages"],
+							},
+						},
+					},
+				},
+			},
+		}
+	end
+	return options
+end
+
+function Spamalyzer:SetupOptions()
+	LibStub("AceConfig-3.0"):RegisterOptionsTable(ADDON_NAME, GetOptions())
+	self.options_frame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions(ADDON_NAME)
+end
