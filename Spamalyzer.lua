@@ -97,10 +97,10 @@ local ICON_MINUS	= [[|TInterface\BUTTONS\UI-MinusButton-Up:20:20|t]]
 -------------------------------------------------------------------------------
 -- Helper functions.
 -------------------------------------------------------------------------------
+local function StoreMessage(prefix, message, type, target, origin)
 function Spamalyzer:SendAddonMessage(prefix, message, type, target)
 end
 
-function Spamalyzer:AddMessage(prefix, message, type, target, name)
 end
 
 -------------------------------------------------------------------------------
@@ -124,7 +124,7 @@ function Spamalyzer:OnEnable()
 		text	= DISPLAY_VALUES[db.datafeed.display],
 		icon	= "Interface\\Icons\\INV_Letter_16",
 	})
-	self:RegisterEvent("CHAT_MSG_ADDON", self.AddMessage)
+	self:RegisterEvent("CHAT_MSG_ADDON", StoreMessage)
 
 	if LDBIcon then
 		LDBIcon:Register(ADDON_NAME, data_obj, db.datafeed.minimap_icon)
