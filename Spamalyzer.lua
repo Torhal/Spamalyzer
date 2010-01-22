@@ -62,8 +62,10 @@ local SORT_VALUES = {
 }
 
 local DISPLAY_VALUES = {
-	[1]	= L["Messages"],
-	[2]	= L["Bytes"],
+	[1]	= L["Sent"],
+	[2]	= L["Received"],
+	[3]	= L["Bytes Out"],
+	[4]	= L["Bytes In"],
 }
 
 local TRACKING_CHECKS = {
