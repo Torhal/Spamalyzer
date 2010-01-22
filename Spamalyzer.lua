@@ -183,7 +183,7 @@ function Spamalyzer:OnEnable()
 		text	= DISPLAY_VALUES[db.datafeed.display],
 		icon	= "Interface\\Icons\\INV_Letter_16",
 	})
-	self:RegisterEvent("CHAT_MSG_ADDON", StoreMessage)
+	self:RegisterEvent("CHAT_MSG_ADDON")
 	self:SecureHook("SendAddonMessage")
 
 	if LDBIcon then
@@ -194,7 +194,9 @@ end
 function Spamalyzer:OnDisable()
 end
 
-function Spamalyzer:CHAT_MSG_ADDON()
+function Spamalyzer:CHAT_MSG_ADDON(event, prefix, message, channel, sender)
+-- DEBUG	print(string.format("CHAT_MSG_ADDON - %s (%s)", prefix, sender))
+	StoreMessage(prefix, message, channel, sender)
 end
 
 -------------------------------------------------------------------------------
