@@ -38,7 +38,6 @@ local defaults = {
 		},
 		general = {
 			display_frame	= 1,	-- None
-			rename_prefix	= true,
 		},
 		tracking = {
 			battleground	= false,
