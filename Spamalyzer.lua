@@ -23,6 +23,7 @@ local L			= LibStub("AceLocale-3.0"):GetLocale(ADDON_NAME)
 
 local db
 local data_obj
+local output_frame
 local tooltip
 
 -------------------------------------------------------------------------------
@@ -68,6 +69,15 @@ local DISPLAY_VALUES = {
 	[4]	= L["Bytes In"],
 }
 
+local CHAT_FRAME_MAP = {
+	[1]	= nil,
+	[2]	= ChatFrame1,
+	[3]	= ChatFrame2,
+	[4]	= ChatFrame3,
+	[5]	= ChatFrame4,
+	[6]	= ChatFrame5,
+	[7]	= ChatFrame6,
+	[8]	= ChatFrame7,
 local TRACKING_CHECKS = {
 	["BATTLEGROUND"]	= function() return db.track.battleground end,
 	["GUILD"]		= function() return db.track.guild end,
@@ -119,6 +129,8 @@ end
 function Spamalyzer:OnInitialize()
 	local temp_db = LibStub("AceDB-3.0"):New(ADDON_NAME.."DB", defaults)
 	db = temp_db.global
+
+	output_frame = CHAT_FRAME_MAP[db.general.display_frame]
 
 	self:SetupOptions()
 end
@@ -207,7 +219,10 @@ local function GetOptions()
 							name	= _G.DISPLAY_OPTIONS,
 							desc	= L["Secondary location to display AddOn messages."],
 							get	= function() return db.general.display_frame end,
-							set	= function(info, value) db.general.display_frame = value end,
+							set	= function(info, value)
+									  db.general.display_frame = value
+									  output_frame = CHAT_FRAME_MAP[value]
+								  end,
 							values	= {
 								[1]	= _G.NONE,
 								[2]	= L["ChatFrame1"],
