@@ -98,14 +98,20 @@ local ICON_MINUS	= [[|TInterface\BUTTONS\UI-MinusButton-Up:20:20|t]]
 -- Helper functions.
 -------------------------------------------------------------------------------
 local function StoreMessage(prefix, message, type, target, origin)
-function Spamalyzer:SendAddonMessage(prefix, message, type, target)
-end
-
 end
 
 -------------------------------------------------------------------------------
 -- Tooltip and Databroker methods.
 -------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+-- Hooked functions.
+-------------------------------------------------------------------------------
+function Spamalyzer:SendAddonMessage(prefix, message, type, target)
+	if msgtype == "WHISPER" and destination and destination ~= "" then
+		StoreMessage(prefix, message, type, MY_NAME, target)
+	end
+end
 
 -------------------------------------------------------------------------------
 -- Event functions.
@@ -125,6 +131,7 @@ function Spamalyzer:OnEnable()
 		icon	= "Interface\\Icons\\INV_Letter_16",
 	})
 	self:RegisterEvent("CHAT_MSG_ADDON", StoreMessage)
+	self:SecureHook("SendAddonMessage")
 
 	if LDBIcon then
 		LDBIcon:Register(ADDON_NAME, data_obj, db.datafeed.minimap_icon)
