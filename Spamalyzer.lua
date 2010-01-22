@@ -200,13 +200,68 @@ local function GetOptions()
 					},
 				},
 				-------------------------------------------------------------------------------
+				-- Tracking options.
+				-------------------------------------------------------------------------------
+				tracking = {
+					name	= L["Tracking"],
+					order	= 30,
+					type	= "group",
+					args	= {
+						battleground = {
+							order	= 10,
+							type	= "toggle",
+							width	= "full",
+							name	= _G.BATTLEGROUND,
+							desc	= string.format(L["Toggle recording of %s AddOn messages."], _G.BATTLEGROUND),
+							get	= function() return db.tracking.battleground end,
+							set	= function() db.tracking.battleground = not db.tracking.battleground end,
+						},
+						guild = {
+							order	= 20,
+							type	= "toggle",
+							width	= "full",
+							name	= _G.GUILD,
+							desc	= string.format(L["Toggle recording of %s AddOn messages."], _G.GUILD),
+							get	= function() return db.tracking.guild end,
+							set	= function() db.tracking.guild = not db.tracking.guild end,
+						},
+						party = {
+							order	= 30,
+							type	= "toggle",
+							width	= "full",
+							name	= _G.PARTY,
+							desc	= string.format(L["Toggle recording of %s AddOn messages."], _G.PARTY),
+							get	= function() return db.tracking.party end,
+							set	= function() db.tracking.party = not db.tracking.party end,
+						},
+						raid = {
+							order	= 40,
+							type	= "toggle",
+							width	= "full",
+							name	= _G.RAID,
+							desc	= string.format(L["Toggle recording of %s AddOn messages."], _G.RAID),
+							get	= function() return db.tracking.raid end,
+							set	= function() db.tracking.raid = not db.tracking.raid end,
+						},
+						whisper	= {
+							order	= 50,
+							type	= "toggle",
+							width	= "full",
+							name	= _G.WHISPER,
+							desc	= string.format(L["Toggle recording of %s AddOn messages."], _G.WHISPER),
+							get	= function() return db.tracking.whisper end,
+							set	= function() db.tracking.whisper = not db.tracking.whisper end,
+						},
+					},
+				},
+				-------------------------------------------------------------------------------
 				-- Tooltip options.
 				-------------------------------------------------------------------------------
 				tooltip = {
-					name = L["Tooltip"],
-					order = 30,
-					type = "group",
-					args = {
+					name	= L["Tooltip"],
+					order	= 40,
+					type	= "group",
+					args	= {
 						scale = {
 							order	= 10,
 							type	= "range",
