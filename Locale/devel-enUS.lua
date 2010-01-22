@@ -37,4 +37,6 @@ L["Secondary location to display AddOn messages."]		= true
 L["Shift+Left-click to clear data."]				= true
 L["Sort By"]							= true
 
+L["Toggle recording of %s AddOn messages."]			= true
 L["Tooltip"]							= true
+L["Tracking"]							= true
