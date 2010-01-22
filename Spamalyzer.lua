@@ -10,11 +10,12 @@ local pairs = _G.pairs
 -------------------------------------------------------------------------------
 -- Addon namespace.
 -------------------------------------------------------------------------------
+local ADDON_NAME, namespace	= ...
+
+local KNOWN_PREFIXES		= namespace.prefixes
+
 local LibStub		= _G.LibStub
-
-local ADDON_NAME	= ...
-local Spamalyzer	= LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceEvent-3.0")
-
+local Spamalyzer	= LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceEvent-3.0", "AceHook-3.0")
 local LQT		= LibStub("LibQTip-1.0")
 local LDB		= LibStub("LibDataBroker-1.1")
 local LDBIcon		= LibStub("LibDBIcon-1.0")
