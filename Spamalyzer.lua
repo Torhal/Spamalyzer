@@ -55,6 +55,17 @@ local defaults = {
 	}
 }
 
+local SORT_VALUES = {
+	[1]	= L["Name"],
+	[2]	= L["Bytes"],
+	[3]	= L["Messages"],
+}
+
+local DISPLAY_VALUES = {
+	[1]	= L["Messages"],
+	[2]	= L["Bytes"],
+}
+
 local TRACKING_CHECKS = {
 	["BATTLEGROUND"]	= function() return db.track.battleground end,
 	["GUILD"]		= function() return db.track.guild end,
@@ -105,7 +116,7 @@ function Spamalyzer:OnEnable()
 	data_obj = LDB:NewDataObject(ADDON_NAME, {
 		type	= "data source",
 		label	= ADDON_NAME,
-		text	= " ",
+		text	= DISPLAY_VALUES[db.datafeed.display],
 		icon	= "Interface\\Icons\\INV_Letter_16",
 	})
 	self:RegisterEvent("CHAT_MSG_ADDON", self.AddMessage)
@@ -147,12 +158,11 @@ local function GetOptions()
 							name	= _G.DISPLAY_LABEL,
 							desc	= "",
 							get	= function() return db.datafeed.display end,
-							set	= function(info, value) db.datafeed.display = value end,
-							values	= {
-								[1]	= L["Messages"],
-								[2]	= L["Bytes"],
-							},
-
+							set	= function(info, value)
+									  db.datafeed.display = value
+									  data_obj.text = DISPLAY_VALUES[value]
+								  end,
+							values	= DISPLAY_VALUES,
 						},
 						minimap_icon = {
 							order	= 20,
@@ -313,11 +323,7 @@ local function GetOptions()
 							desc	= L["Method to use when sorting entries in the tooltip."],
 							get	= function() return db.tooltip.sorting end,
 							set	= function(info, value) db.tooltip.sorting = value end,
-							values	= {
-								[1]	= L["Name"],
-								[2]	= L["Bytes"],
-								[3]	= L["Messages"],
-							},
+							values	= SORT_VALUES,
 						},
 					},
 				},
