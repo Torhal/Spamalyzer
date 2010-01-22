@@ -78,12 +78,6 @@ local CHAT_FRAME_MAP = {
 	[6]	= ChatFrame5,
 	[7]	= ChatFrame6,
 	[8]	= ChatFrame7,
-local TRACKING_CHECKS = {
-	["BATTLEGROUND"]	= function() return db.track.battleground end,
-	["GUILD"]		= function() return db.track.guild end,
-	["PARTY"]		= function() return db.track.party end,
-	["RAID"]		= function() return db.track.raid end,
-	["WHISPER"]		= function() return db.track.whisper end,
 }
 
 local MY_NAME		= UnitName("player")
