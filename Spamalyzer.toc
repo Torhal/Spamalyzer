@@ -17,4 +17,5 @@ embeds.xml
 #@end-no-lib-strip@
 
 locale.xml
+Prefixes.lua
 Spamalyzer.lua
