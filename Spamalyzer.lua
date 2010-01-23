@@ -8,6 +8,9 @@ local string = _G.string
 local table = _G.table
 
 local pairs = _G.pairs
+local ipairs = _G.ipairs
+
+local tostring = _G.tostring
 
 -------------------------------------------------------------------------------
 -- Addon namespace.
@@ -115,19 +118,19 @@ do
 
 	local function TimeStr(seconds)
 		local tm = seconds
-		local timeval = tostring(floor(tm % 60)).."s"
+		local timeval = tostring(math.floor(tm % 60)).."s"
 
 		if tm >= 60 then
 			tm = tm / 60
-			timeval = tostring(floor(tm % 60)).."m"..timeval
+			timeval = tostring(math.floor(tm % 60)).."m"..timeval
 
 			if tm >= 60 then
 				tm = tm / 60
-				timeval = tostring(floor(tm % 24)).."h"..timeval
+				timeval = tostring(math.floor(tm % 24)).."h"..timeval
 
 				if tm >= 24 then
 					tm = tm / 24
-					timeval = tostring(floor(tm)).."d"..timeval
+					timeval = tostring(math.floor(tm)).."d"..timeval
 				end
 			end
 		end
