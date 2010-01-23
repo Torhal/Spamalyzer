@@ -115,60 +115,67 @@ do
 	local NUM_COLUMNS = 4
 	local elapsed_line
 
-	local function TimeStr(seconds)
-		local tm = seconds
-		local timeval = tostring(math.floor(tm % 60)).."s"
+	local SetElapsedLine
+	do
+		local last_update = GetTime()
 
-		if tm >= 60 then
-			tm = tm / 60
-			timeval = tostring(math.floor(tm % 60)).."m"..timeval
+		local function TimeStr(val)
+			local tm = tonumber(val)
 
-			if tm >= 60 then
-				tm = tm / 60
-				timeval = tostring(math.floor(tm % 24)).."h"..timeval
-
-				if tm >= 24 then
-					tm = tm / 24
-					timeval = tostring(math.floor(tm)).."d"..timeval
-				end
+			if tm <= 0 then
+				return "0s"
 			end
+			local hours = math.floor(tm / 3600)
+			local minutes = math.floor(tm / 60 - (hours * 60))
+			local seconds = math.floor(tm - hours * 3600 - minutes * 60)
+
+			hours = hours > 0 and (hours.."h") or ""
+			minutes = minutes > 0 and (minutes.."m") or ""
+			seconds = seconds > 0 and (seconds.."s") or ""
+			return hours..minutes..seconds
 		end
-		return timeval
+
+		function SetElapsedLine()
+			local now = GetTime()
+
+			if now - last_update < 1 then
+				return
+			end
+			last_update = now
+
+			tooltip:SetCell(elapsed_line, 1, string.format("%s %s", _G.TIME_ELAPSED, TimeStr(now - epoch)), "CENTER", NUM_COLUMNS)
+		end
 	end
 
-	local function SetElapsedLine()
-		tooltip:SetCell(elapsed_line, 1, string.format("%s %s", _G.TIME_ELAPSED, TimeStr(GetTime() - epoch)), "CENTER", NUM_COLUMNS)
-	end
 	local last_update = 0
+	local check_update = 0
 
 	updater = CreateFrame("Frame", nil, UIParent)
+	updater:Hide()
 
 	-- Handles tooltip hiding and the dynamic refresh of data
 	updater:SetScript("OnUpdate",
 			  function(self, elapsed)
-				  last_update = last_update + elapsed
+				  check_update = check_update + elapsed
 
-				  if last_update < 0.1 then
+				  if check_update < 0.1 then
 					  return
 				  end
 
 				  if tooltip:IsMouseOver() or (LDB_anchor and LDB_anchor:IsMouseOver()) then
-					  if elapsed_line and last_update >= 0.5 then
-						  SetElapsedLine()
-					  end
+					  SetElapsedLine()
+					  last_update = 0
 				  else
+					  last_update = last_update + check_update
+
 					  if last_update >= db.tooltip.timer then
 						  tooltip = LQT:Release(tooltip)
 						  LDB_anchor = nil
 						  elapsed_line = nil
-						  last_update = 0
 						  self:Hide()
 					  end
 				  end
-
-				  if last_update >= 1 then
-					  last_update = 0
-				  end
+				  check_update = 0
 			  end)
 
 	local ICON_PLUS		= [[|TInterface\BUTTONS\UI-PlusButton-Up:20:20|t]]
