@@ -408,6 +408,10 @@ function Spamalyzer:OnEnable()
 					  else
 						  InterfaceOptionsFrame_OpenToCategory(Spamalyzer.options_frame)
 					  end
+				  elseif button == "LeftButton" and IsShiftKeyDown() then
+					  table.wipe(sorted_data)
+					  elapsed_line = nil
+					  DrawTooltip(display)
 				  end
 			  end,
 	})
