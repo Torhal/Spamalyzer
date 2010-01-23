@@ -23,11 +23,6 @@ local LDB		= LibStub("LibDataBroker-1.1")
 local LDBIcon		= LibStub("LibDBIcon-1.0")
 local L			= LibStub("AceLocale-3.0"):GetLocale(ADDON_NAME)
 
-local db
-local data_obj
-local output_frame
-local tooltip
-
 -------------------------------------------------------------------------------
 -- Constants.
 -------------------------------------------------------------------------------
@@ -99,6 +94,10 @@ local ICON_MINUS	= [[|TInterface\BUTTONS\UI-MinusButton-Up:20:20|t]]
 -------------------------------------------------------------------------------
 -- Variables.
 -------------------------------------------------------------------------------
+local db
+local data_obj
+local output_frame
+local tooltip
 
 -------------------------------------------------------------------------------
 -- Helper functions.
