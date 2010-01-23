@@ -96,8 +96,145 @@ local sorted_data = {}
 
 local db
 local output_frame
+local epoch = GetTime()
+
+-------------------------------------------------------------------------------
+-- Tooltip and Databroker methods.
+-------------------------------------------------------------------------------
+local DrawTooltip		-- Upvalue needed for chicken-or-egg-syndrome.
+
+local updater
 local data_obj
+local LDB_anchor
 local tooltip
+
+do
+	local last_update = 0
+	local NUM_COLUMNS = 4
+	local elapsed_line
+
+	local function TimeStr(seconds)
+		local tm = seconds
+		local timeval = tostring(floor(tm % 60)).."s"
+
+		if tm >= 60 then
+			tm = tm / 60
+			timeval = tostring(floor(tm % 60)).."m"..timeval
+
+			if tm >= 60 then
+				tm = tm / 60
+				timeval = tostring(floor(tm % 24)).."h"..timeval
+
+				if tm >= 24 then
+					tm = tm / 24
+					timeval = tostring(floor(tm)).."d"..timeval
+				end
+			end
+		end
+		return timeval
+	end
+
+	local function SetElapsedLine()
+		tooltip:SetCell(elapsed_line, 1, string.format("%s %s", _G.TIME_ELAPSED, TimeStr(GetTime() - epoch)), "CENTER", NUM_COLUMNS)
+	end
+
+	updater = CreateFrame("Frame", nil, UIParent)
+	updater.elapsed = 0
+
+	-- Handles tooltip hiding and the dynamic refresh of data
+	updater:SetScript("OnUpdate",
+			  function(self, elapsed)
+				  last_update = last_update + elapsed
+
+				  if last_update < 0.1 then
+					  return
+				  end
+
+				  if tooltip then
+					  if tooltip:IsMouseOver() or (LDB_anchor and LDB_anchor:IsMouseOver()) then
+						  if elapsed_line then
+							  SetElapsedLine()
+						  end
+						  self.elapsed = 0
+					  else
+						  self.elapsed = self.elapsed + last_update
+
+						  if self.elapsed >= db.tooltip.timer then
+							  tooltip = LQT:Release(tooltip)
+							  LDB_anchor = nil
+							  elapsed_line = nil
+						  end
+					  end
+				  end
+				  last_update = 0
+			  end)
+
+	local ICON_PLUS		= [[|TInterface\BUTTONS\UI-PlusButton-Up:20:20|t]]
+	local ICON_MINUS	= [[|TInterface\BUTTONS\UI-MinusButton-Up:20:20|t]]
+
+	local function NameOnMouseUp(cell, index)
+		sorted_data[index].toggled = not sorted_data[index].toggled
+		DrawTooltip(LDB_anchor)
+	end
+
+	function DrawTooltip(anchor)
+		LDB_anchor = anchor
+
+		if not tooltip then
+			tooltip = LQT:Acquire(ADDON_NAME.."Tooltip", NUM_COLUMNS, "LEFT", "CENTER", "CENTER", "CENTER")
+
+			if _G.TipTac and _G.TipTac.AddModifiedTip then
+				-- Pass true as second parameter because hooking OnHide causes C stack overflows
+				TipTac:AddModifiedTip(tooltip, true)
+			end
+		end
+		tooltip:Clear()
+		tooltip:SmartAnchorTo(anchor)
+		tooltip:SetScale(db.tooltip.scale)
+
+		local line, column = tooltip:AddHeader()
+
+		tooltip:SetCell(line, 1, ADDON_NAME, "CENTER", NUM_COLUMNS)
+		tooltip:AddSeparator()
+
+		if #sorted_data == 0 then
+			line = tooltip:AddLine()
+			tooltip:SetCell(line, 1, _G.EMPTY, "CENTER", NUM_COLUMNS)
+
+			updater.elapsed = 0
+			tooltip:Show()
+			return
+		end
+		tooltip:AddLine(" ", _G.NAME, L["Messages"], L["Bytes"])
+
+		for index, entry in ipairs(sorted_data) do
+			local toggled = entry.toggled
+
+			line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", entry.messages, entry.output)
+			tooltip:SetCell(line, 2, entry.name, "LEFT")
+			tooltip:SetCellScript(line, 1, "OnMouseUp", NameOnMouseUp, index)
+
+			if toggled then
+				tooltip:AddSeparator()
+
+				for addon, data in pairs(entry.sources) do
+					local color = data.known and COLOR_GREEN or (addon:match("UNKNOWN") and COLOR_YELLOW or COLOR_RED)
+
+					line = tooltip:AddLine(" ", " ", data.messages, data.output)
+					tooltip:SetCell(line, 2, string.format("%s%s|r", color, addon), "LEFT")
+				end
+				tooltip:AddLine(" ")
+			end
+		end
+		tooltip:AddLine(" ")
+
+		elapsed_line = tooltip:AddLine()
+		SetElapsedLine()
+
+		updater.elapsed = 0
+		tooltip:Show()
+	end
+end	-- do
 
 -------------------------------------------------------------------------------
 -- Helper functions.
