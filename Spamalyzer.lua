@@ -182,7 +182,7 @@ local function StoreMessage(prefix, message, type, origin, target)
 		player.sources[addon_name] = {
 			["messages"]	= 1,
 			["output"]	= bytes,
-			["known"]	= addon_name == prefix,
+			["known"]	= addon_name ~= prefix,
 		}
 		table.insert(sorted_data, player)
 		table.sort(sorted_data, SORT_FUNCS[db.tooltip.sorting])
@@ -196,7 +196,7 @@ local function StoreMessage(prefix, message, type, origin, target)
 
 		if not source then
 			source = {
-				["known"] = addon_name == prefix
+				["known"] = addon_name ~= prefix
 			}
 			player.sources[addon_name] = source
 		end
