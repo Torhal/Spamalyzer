@@ -130,16 +130,16 @@ local function EscapeChar(c)
 end
 
 local function StoreMessage(prefix, message, type, origin, target)
-	local name
+	local addon_name
 
 	if KNOWN_PREFIXES[prefix] then
-		name = KNOWN_PREFIXES[prefix]
+		addon_name = KNOWN_PREFIXES[prefix]
 	elseif prefix:match("^$Tranq") then
-		name = "SimpleTranqShot"
+		addon_name = "SimpleTranqShot"
 	elseif prefix:match("^vgcomm") then
-		name = "VGComms"
+		addon_name = "VGComms"
 	elseif prefix:match("^CC_") then
-		name = "ClassChannels"
+		addon_name = "ClassChannels"
 	else
 		-- Try escaping it and testing for AceComm-3.0 multi-part
 		local escaped_prefix = prefix:gsub("[%c\092\128-\255]", EscapeChar)
@@ -148,22 +148,22 @@ local function StoreMessage(prefix, message, type, origin, target)
 			local matched_prefix = escaped_prefix:match("(.-)\\%d%d%d")
 
 			if KNOWN_PREFIXES[matched_prefix] then
-				name = KNOWN_PREFIXES[matched_prefix]
+				addon_name = KNOWN_PREFIXES[matched_prefix]
 			end
 		end
 		-- Cache this in the prefix table
-		KNOWN_PREFIXES[prefix] = name
--- DEBUG		print(string.format("Adding prefix %s as '%s'", prefix, name))
+		KNOWN_PREFIXES[prefix] = addon_name
 	end
 
 	if output_frame then
 		local color = (not db.tracking[type:lower()]) and COLOR_PINK or COLOR_PALE_GREEN
+		local display_name = addon_name and (addon_name.." ("..prefix..")") or prefix
 
 		message = message or ""
 		target = target and (" to "..target..", from ") or ""
 
 		output_frame:AddMessage(string.format("%s[%s][%s][%s]|r%s%s[%s]|r",
-						      color, prefix, message, type, target, color, origin))
+						      color, display_name, message, type, target, color, origin))
 	end
 	local bytes = string.len(prefix) + string.len(message)
 
