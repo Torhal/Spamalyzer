@@ -31,7 +31,7 @@ L["Move the slider to adjust the scale of the tooltip."]	= true
 L["Move the slider to adjust the tooltip fade time."]		= true
 
 L["Received"]							= true
-L["Right-click to open configuration menu."]			= true
+L["Right-click for options."]					= true
 
 L["Scale"]							= true
 L["Secondary location to display AddOn messages."]		= true
