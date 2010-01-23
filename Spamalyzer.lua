@@ -54,7 +54,7 @@ local defaults = {
 }
 
 local SORT_VALUES = {
-	[1]	= L["Name"],
+	[1]	= _G.NAME,
 	[2]	= L["Bytes"],
 	[3]	= L["Messages"],
 }
@@ -217,7 +217,6 @@ end
 -------------------------------------------------------------------------------
 function Spamalyzer:SendAddonMessage(prefix, message, type, target)
 	if type == "WHISPER" and target and target ~= "" then
--- DEBUG		print(string.format("SendAddonMessage - %s", prefix))
 		StoreMessage(prefix, message, type, MY_NAME, target)
 	end
 end
@@ -253,7 +252,6 @@ function Spamalyzer:OnDisable()
 end
 
 function Spamalyzer:CHAT_MSG_ADDON(event, prefix, message, channel, sender)
--- DEBUG	print(string.format("CHAT_MSG_ADDON - %s (%s)", prefix, sender))
 	StoreMessage(prefix, message, channel, sender)
 end
 
