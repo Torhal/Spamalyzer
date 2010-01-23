@@ -88,9 +88,6 @@ local COLOR_RED		= "|cffff0000"
 local COLOR_WHITE	= "|cffffffff"
 local COLOR_YELLOW	= "|cffffff00"
 
-local ICON_PLUS		= [[|TInterface\BUTTONS\UI-PlusButton-Up:20:20|t]]
-local ICON_MINUS	= [[|TInterface\BUTTONS\UI-MinusButton-Up:20:20|t]]
-
 -------------------------------------------------------------------------------
 -- Variables.
 -------------------------------------------------------------------------------
@@ -98,8 +95,8 @@ local players = {}
 local sorted_data = {}
 
 local db
-local data_obj
 local output_frame
+local data_obj
 local tooltip
 
 -------------------------------------------------------------------------------
