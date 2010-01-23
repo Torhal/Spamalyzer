@@ -340,11 +340,11 @@ local function StoreMessage(prefix, message, type, origin, target)
 		source.output = (source.output or 0) + bytes
 		source.messages = (source.messages or 0) + 1
 	end
-end
 
--------------------------------------------------------------------------------
--- Tooltip and Databroker methods.
--------------------------------------------------------------------------------
+	if LDB_anchor and tooltip and tooltip:IsVisible() then
+		DrawTooltip(LDB_anchor)
+	end
+end
 
 -------------------------------------------------------------------------------
 -- Hooked functions.
