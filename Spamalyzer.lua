@@ -3,8 +3,10 @@
 -------------------------------------------------------------------------------
 local _G = getfenv(0)
 
-local string = _G.string
 local math = _G.math
+local string = _G.string
+local table = _G.table
+
 local pairs = _G.pairs
 
 -------------------------------------------------------------------------------
