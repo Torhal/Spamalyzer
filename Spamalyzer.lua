@@ -619,7 +619,10 @@ local function GetOptions()
 							name	= L["Sort By"],
 							desc	= L["Method to use when sorting entries in the tooltip."],
 							get	= function() return db.tooltip.sorting end,
-							set	= function(info, value) db.tooltip.sorting = value end,
+							set	= function(info, value)
+									  db.tooltip.sorting = value
+									  table.sort(sorted_data, SORT_FUNCS[value])
+								  end,
 							values	= SORT_VALUES,
 						},
 					},
