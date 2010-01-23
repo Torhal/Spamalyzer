@@ -324,7 +324,8 @@ local function StoreMessage(prefix, message, type, origin, target)
 	if bytes == 0 then
 		return
 	end
-	addon_name = addon_name or prefix	-- Ensure that addon_name is not nil.
+	local known = addon_name and true or false	-- If addon_name is nil, we didn't find a match.
+	addon_name = addon_name or prefix		-- Ensure that addon_name is not nil.
 
 	local player = players[origin]
 
@@ -339,7 +340,7 @@ local function StoreMessage(prefix, message, type, origin, target)
 		player.sources[addon_name] = {
 			["messages"]	= 1,
 			["output"]	= bytes,
-			["known"]	= addon_name ~= prefix,
+			["known"]	= known,
 		}
 		table.insert(sorted_data, player)
 		table.sort(sorted_data, SORT_FUNCS[db.tooltip.sorting])
@@ -353,7 +354,7 @@ local function StoreMessage(prefix, message, type, origin, target)
 
 		if not source then
 			source = {
-				["known"] = addon_name ~= prefix
+				["known"] = known
 			}
 			player.sources[addon_name] = source
 		end
