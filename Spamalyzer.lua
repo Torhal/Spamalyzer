@@ -71,13 +71,13 @@ local DISPLAY_VALUES = {
 
 local CHAT_FRAME_MAP = {
 	[1]	= nil,
-	[2]	= ChatFrame1,
-	[3]	= ChatFrame2,
-	[4]	= ChatFrame3,
-	[5]	= ChatFrame4,
-	[6]	= ChatFrame5,
-	[7]	= ChatFrame6,
-	[8]	= ChatFrame7,
+	[2]	= _G.ChatFrame1,
+	[3]	= _G.ChatFrame2,
+	[4]	= _G.ChatFrame3,
+	[5]	= _G.ChatFrame4,
+	[6]	= _G.ChatFrame5,
+	[7]	= _G.ChatFrame6,
+	[8]	= _G.ChatFrame7,
 }
 
 local MY_NAME		= UnitName("player")
