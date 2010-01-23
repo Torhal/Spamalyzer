@@ -94,6 +94,9 @@ local ICON_MINUS	= [[|TInterface\BUTTONS\UI-MinusButton-Up:20:20|t]]
 -------------------------------------------------------------------------------
 -- Variables.
 -------------------------------------------------------------------------------
+local players = {}
+local sorted_data = {}
+
 local db
 local data_obj
 local output_frame
@@ -102,6 +105,26 @@ local tooltip
 -------------------------------------------------------------------------------
 -- Helper functions.
 -------------------------------------------------------------------------------
+local SORT_FUNCS	-- Required for recursion, since the table is referenced within its own definition.
+
+SORT_FUNCS = {
+	[1]	= function(a, b)	-- Name
+			  return a.name < b.name
+		  end,
+	[2]	= function(a, b)	-- Bytes
+			  if a.output == b.output then
+				  return SORT_FUNCS[1](a, b)
+			  end
+			  return a.output < b.output
+		  end,
+	[3]	= function(a, b)	-- Messages
+			  if a.messages == b.messages then
+				  return SORT_FUNCS[1](a, b)
+			  end
+			  return a.messages < b.messages
+		  end
+}
+
 local function EscapeChar(c)
 	return ("\\%03d"):format(c:byte())
 end
