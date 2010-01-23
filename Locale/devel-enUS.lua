@@ -24,8 +24,6 @@ L["Timer"]							= true
 L["Hide Hint Text"]						= true
 L["Hides the hint text at the bottom of the tooltip."]		= true
 
-L["Name"]							= true
-
 L["Messages"]							= true
 L["Method to use when sorting entries in the tooltip."]		= true
 L["Minimap Icon"]						= true
