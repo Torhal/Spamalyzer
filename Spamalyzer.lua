@@ -112,7 +112,6 @@ local LDB_anchor
 local tooltip
 
 do
-	local last_update = 0
 	local NUM_COLUMNS = 4
 	local elapsed_line
 
@@ -140,9 +139,9 @@ do
 	local function SetElapsedLine()
 		tooltip:SetCell(elapsed_line, 1, string.format("%s %s", _G.TIME_ELAPSED, TimeStr(GetTime() - epoch)), "CENTER", NUM_COLUMNS)
 	end
+	local last_update = 0
 
 	updater = CreateFrame("Frame", nil, UIParent)
-	updater.elapsed = 0
 
 	-- Handles tooltip hiding and the dynamic refresh of data
 	updater:SetScript("OnUpdate",
@@ -153,23 +152,23 @@ do
 					  return
 				  end
 
-				  if tooltip then
-					  if tooltip:IsMouseOver() or (LDB_anchor and LDB_anchor:IsMouseOver()) then
-						  if elapsed_line then
-							  SetElapsedLine()
-						  end
-						  self.elapsed = 0
-					  else
-						  self.elapsed = self.elapsed + last_update
-
-						  if self.elapsed >= db.tooltip.timer then
-							  tooltip = LQT:Release(tooltip)
-							  LDB_anchor = nil
-							  elapsed_line = nil
-						  end
+				  if tooltip:IsMouseOver() or (LDB_anchor and LDB_anchor:IsMouseOver()) then
+					  if elapsed_line and last_update >= 0.5 then
+						  SetElapsedLine()
+					  end
+				  else
+					  if last_update >= db.tooltip.timer then
+						  tooltip = LQT:Release(tooltip)
+						  LDB_anchor = nil
+						  elapsed_line = nil
+						  last_update = 0
+						  self:Hide()
 					  end
 				  end
-				  last_update = 0
+
+				  if last_update >= 1 then
+					  last_update = 0
+				  end
 			  end)
 
 	local ICON_PLUS		= [[|TInterface\BUTTONS\UI-PlusButton-Up:20:20|t]]
@@ -203,9 +202,8 @@ do
 		if #sorted_data == 0 then
 			line = tooltip:AddLine()
 			tooltip:SetCell(line, 1, _G.EMPTY, "CENTER", NUM_COLUMNS)
-
-			updater.elapsed = 0
 			tooltip:Show()
+			updater:Show()
 			return
 		end
 		tooltip:AddLine(" ", _G.NAME, L["Messages"], L["Bytes"])
@@ -234,8 +232,8 @@ do
 		elapsed_line = tooltip:AddLine()
 		SetElapsedLine()
 
-		updater.elapsed = 0
 		tooltip:Show()
+		updater:Show()
 	end
 end	-- do
 
@@ -380,7 +378,6 @@ function Spamalyzer:OnEnable()
 				  DrawTooltip(display)
 			  end,
 		OnLeave	= function()
-				  updater.elapsed = 0
 			  end,
 		OnClick = function(display, button)
 				  if button == "RightButton" then
