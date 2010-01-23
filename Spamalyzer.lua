@@ -110,10 +110,10 @@ local updater
 local data_obj
 local LDB_anchor
 local tooltip
+local elapsed_line
 
 do
 	local NUM_COLUMNS = 4
-	local elapsed_line
 
 	local SetElapsedLine
 	do
@@ -136,6 +136,9 @@ do
 		end
 
 		function SetElapsedLine()
+			if not elapsed_line then
+				return
+			end
 			local now = GetTime()
 
 			if now - last_update < 1 then
@@ -143,7 +146,7 @@ do
 			end
 			last_update = now
 
-			tooltip:SetCell(elapsed_line, 1, string.format("%s %s", _G.TIME_ELAPSED, TimeStr(now - epoch)), "CENTER", NUM_COLUMNS)
+			tooltip:SetCell(elapsed_line, NUM_COLUMNS, TimeStr(now - epoch))
 		end
 	end
 
@@ -213,32 +216,41 @@ do
 			updater:Show()
 			return
 		end
-		tooltip:AddLine(" ", _G.NAME, L["Messages"], L["Bytes"])
+		line = tooltip:AddLine(" ", " ", L["Messages"], L["Bytes"])
+		tooltip:SetCell(line, 1, _G.NAME, "LEFT", 2)
 
 		for index, entry in ipairs(sorted_data) do
 			local toggled = entry.toggled
 
 			line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", entry.messages, entry.output)
 			tooltip:SetCell(line, 2, entry.name, "LEFT")
+
 			tooltip:SetCellScript(line, 1, "OnMouseUp", NameOnMouseUp, index)
 
 			if toggled then
-				tooltip:AddSeparator()
-
 				for addon, data in pairs(entry.sources) do
 					local color = data.known and COLOR_GREEN or (addon:match("UNKNOWN") and COLOR_YELLOW or COLOR_RED)
 
 					line = tooltip:AddLine(" ", " ", data.messages, data.output)
 					tooltip:SetCell(line, 2, string.format("%s%s|r", color, addon), "LEFT")
 				end
-				tooltip:AddLine(" ")
 			end
 		end
 		tooltip:AddLine(" ")
 
 		elapsed_line = tooltip:AddLine()
+		tooltip:SetCell(elapsed_line, 1, _G.TIME_ELAPSED, "LEFT", 3)
 		SetElapsedLine()
 
+		if not db.tooltip.hide_hint then
+			tooltip:AddLine(" ")
+
+			line = tooltip:AddLine()
+			tooltip:SetCell(line, 1, L["Shift+Left-click to clear data."], "LEFT", NUM_COLUMNS)
+
+			line = tooltip:AddLine()
+			tooltip:SetCell(line, 1, L["Right-click for options."], "LEFT", NUM_COLUMNS)
+		end
 		tooltip:Show()
 		updater:Show()
 	end
