@@ -236,6 +236,23 @@ function Spamalyzer:OnEnable()
 		label	= ADDON_NAME,
 		text	= DISPLAY_VALUES[db.datafeed.display],
 		icon	= "Interface\\Icons\\INV_Letter_16",
+		OnEnter	= function(display, motion)
+				  DrawTooltip(display)
+			  end,
+		OnLeave	= function()
+				  updater.elapsed = 0
+			  end,
+		OnClick = function(display, button)
+				  if button == "RightButton" then
+					  local options_frame = InterfaceOptionsFrame
+
+					  if options_frame:IsVisible() then
+						  options_frame:Hide()
+					  else
+						  InterfaceOptionsFrame_OpenToCategory(Spamalyzer.options_frame)
+					  end
+				  end
+			  end,
 	})
 	self:RegisterEvent("CHAT_MSG_ADDON")
 	self:SecureHook("SendAddonMessage")
