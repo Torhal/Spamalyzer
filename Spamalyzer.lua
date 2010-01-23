@@ -170,8 +170,42 @@ local function StoreMessage(prefix, message, type, origin, target)
 	if bytes == 0 then
 		return
 	end
+	addon_name = addon_name or prefix	-- Ensure that addon_name is not nil.
 
-	-- TODO: Add storage here.
+	local player = players[origin]
+
+	if not player then
+		player = {
+			["name"]	= origin,
+			["messages"]	= 1,
+			["output"]	= bytes,
+			["sources"]	= {}
+		}
+
+		player.sources[addon_name] = {
+			["messages"]	= 1,
+			["output"]	= bytes,
+			["known"]	= addon_name == prefix,
+		}
+		table.insert(sorted_data, player)
+		table.sort(sorted_data, SORT_FUNCS[db.tooltip.sorting])
+
+		players[origin] = player
+	else
+		player.messages = player.messages + 1
+		player.output = player.output + bytes
+
+		local source = player.sources[addon_name]
+
+		if not source then
+			source = {
+				["known"] = addon_name == prefix
+			}
+			player.sources[addon_name] = source
+		end
+		source.output = (source.output or 0) + bytes
+		source.messages = (source.messages or 0) + 1
+	end
 end
 
 -------------------------------------------------------------------------------
