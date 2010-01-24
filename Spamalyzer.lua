@@ -265,6 +265,9 @@ do
 			tooltip:AddLine(" ")
 
 			line = tooltip:AddLine()
+			tooltip:SetCell(line, 1, L["Left-click to change datafeed type."], "LEFT", NUM_COLUMNS)
+
+			line = tooltip:AddLine()
 			tooltip:SetCell(line, 1, L["Shift+Left-click to clear data."], "LEFT", NUM_COLUMNS)
 
 			line = tooltip:AddLine()

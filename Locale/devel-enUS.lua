@@ -24,6 +24,8 @@ L["Hides the hint text at the bottom of the tooltip."]		= true
 
 L["Input"]							= true
 
+L["Left-click to change datafeed type."]			= true
+
 L["Messages"]							= true
 L["Method to use when sorting entries in the tooltip."]		= true
 L["Minimap Icon"]						= true
