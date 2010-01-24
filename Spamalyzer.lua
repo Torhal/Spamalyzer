@@ -105,7 +105,7 @@ local COLOR_YELLOW	= "|cffffff00"
 -------------------------------------------------------------------------------
 -- Variables.
 -------------------------------------------------------------------------------
-local players = {}
+local players = {}		-- List of players and their data.
 local sorted_data = {}
 local activity = {}		-- Messages/bytes in/out
 
@@ -123,6 +123,10 @@ local data_obj
 local LDB_anchor
 local tooltip
 local elapsed_line
+
+local function UpdateDataFeed(value)
+	data_obj.text = DISPLAY_NAMES[value]..": "..(activity[DISPLAY_VALUES[value]] or _G.NONE)
+end
 
 do
 	local NUM_COLUMNS = 4
@@ -386,6 +390,9 @@ local function StoreMessage(prefix, message, type, origin, target)
 	end
 	activity.bytes = (activity.bytes or 0) + bytes
 	activity.messages = (activity.messages or 0) + 1
+
+	UpdateDataFeed(db.datafeed.display)
+
 	if LDB_anchor and tooltip and tooltip:IsVisible() then
 		DrawTooltip(LDB_anchor)
 	end
@@ -416,7 +423,7 @@ function Spamalyzer:OnEnable()
 	data_obj = LDB:NewDataObject(ADDON_NAME, {
 		type	= "data source",
 		label	= ADDON_NAME,
-		text	= DISPLAY_VALUES[db.datafeed.display],
+		text	= " ",
 		icon	= "Interface\\Icons\\INV_Letter_16",
 		OnEnter	= function(display, motion)
 				  DrawTooltip(display)
@@ -443,6 +450,8 @@ function Spamalyzer:OnEnable()
 				  end
 			  end,
 	})
+	UpdateDataFeed(db.datafeed.display)
+
 	self:RegisterEvent("CHAT_MSG_ADDON")
 	self:SecureHook("SendAddonMessage")
 
@@ -486,7 +495,7 @@ local function GetOptions()
 							get	= function() return db.datafeed.display end,
 							set	= function(info, value)
 									  db.datafeed.display = value
-									  data_obj.text = DISPLAY_VALUES[value]
+									  UpdateDataFeed(value)
 								  end,
 							values	= DISPLAY_NAMES,
 						},
