@@ -5,8 +5,6 @@ local L = LibStub("AceLocale-3.0"):NewLocale(ADDON_NAME, "enUS", true)
 if not L then return end
 
 L["Bytes"]							= true
-L["Bytes In"]							= true
-L["Bytes Out"]							= true
 
 L["ChatFrame1"]							= true
 L["ChatFrame2"]							= true
@@ -24,11 +22,15 @@ L["Timer"]							= true
 L["Hide Hint Text"]						= true
 L["Hides the hint text at the bottom of the tooltip."]		= true
 
+L["Input"]							= true
+
 L["Messages"]							= true
 L["Method to use when sorting entries in the tooltip."]		= true
 L["Minimap Icon"]						= true
 L["Move the slider to adjust the scale of the tooltip."]	= true
 L["Move the slider to adjust the tooltip fade time."]		= true
+
+L["Output"]							= true
 
 L["Received"]							= true
 L["Right-click for options."]					= true
