@@ -102,6 +102,33 @@ local COLOR_RED		= "|cffff0000"
 local COLOR_WHITE	= "|cffffffff"
 local COLOR_YELLOW	= "|cffffff00"
 
+local COLOR_TABLE = CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS
+local CLASS_COLORS = {}
+
+for k, v in pairs(COLOR_TABLE) do
+	CLASS_COLORS[k] = string.format("%2x%2x%2x", v.r * 255, v.g * 255, v.b * 255)
+end
+
+local SORT_FUNCS	-- Required for recursion, since the table is referenced within its own definition.
+
+SORT_FUNCS = {
+	[1]	= function(a, b)	-- Name
+			  return a.name < b.name
+		  end,
+	[2]	= function(a, b)	-- Bytes
+			  if a.output == b.output then
+				  return SORT_FUNCS[1](a, b)
+			  end
+			  return a.output > b.output
+		  end,
+	[3]	= function(a, b)	-- Messages
+			  if a.messages == b.messages then
+				  return SORT_FUNCS[1](a, b)
+			  end
+			  return a.messages > b.messages
+		  end
+}
+
 -------------------------------------------------------------------------------
 -- Variables.
 -------------------------------------------------------------------------------
@@ -242,7 +269,7 @@ do
 			local toggled = entry.toggled
 
 			line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", entry.messages, entry.output)
-			tooltip:SetCell(line, 2, entry.name, "LEFT")
+			tooltip:SetCell(line, 2, string.format("|cff%s%s|r", CLASS_COLORS[entry.class] or "cccccc", entry.name), "LEFT")
 
 			tooltip:SetCellScript(line, 1, "OnMouseUp", NameOnMouseUp, index)
 
@@ -281,25 +308,24 @@ end	-- do
 -------------------------------------------------------------------------------
 -- Helper functions.
 -------------------------------------------------------------------------------
-local SORT_FUNCS	-- Required for recursion, since the table is referenced within its own definition.
+local function GetPlayerClass(player)
+	local _, class_english = UnitClass(player)
 
-SORT_FUNCS = {
-	[1]	= function(a, b)	-- Name
-			  return a.name < b.name
-		  end,
-	[2]	= function(a, b)	-- Bytes
-			  if a.output == b.output then
-				  return SORT_FUNCS[1](a, b)
-			  end
-			  return a.output < b.output
-		  end,
-	[3]	= function(a, b)	-- Messages
-			  if a.messages == b.messages then
-				  return SORT_FUNCS[1](a, b)
-			  end
-			  return a.messages < b.messages
-		  end
-}
+	if class_english then
+		return class_english
+	end
+
+	if IsInGuild() then
+		for count = 1, GetNumGuildMembers(false), 1 do
+			local name, _, _, _, _, _, _, _, _, _, class = GetGuildRosterInfo(count)
+
+			if name == player then
+				return class
+			end
+		end
+	end
+	return nil
+end
 
 local function EscapeChar(c)
 	return ("\\%03d"):format(c:byte())
@@ -353,6 +379,7 @@ local function StoreMessage(prefix, message, type, origin, target)
 
 	if not player then
 		player = {
+			["class"]	= GetPlayerClass(origin),
 			["name"]	= origin,
 			["messages"]	= 1,
 			["output"]	= bytes,
@@ -371,6 +398,7 @@ local function StoreMessage(prefix, message, type, origin, target)
 	else
 		player.messages = player.messages + 1
 		player.output = player.output + bytes
+		player.class = player.class or GetPlayerClass(origin)
 
 		local source = player.sources[addon_name]
 
