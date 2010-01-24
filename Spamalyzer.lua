@@ -409,7 +409,11 @@ function Spamalyzer:OnEnable()
 						  InterfaceOptionsFrame_OpenToCategory(Spamalyzer.options_frame)
 					  end
 				  elseif button == "LeftButton" and IsShiftKeyDown() then
-					  table.wipe(sorted_data)
+					  while #sorted_data >= 1 do
+						  table.remove(sorted_data)
+					  end
+					  table.wipe(players)
+
 					  elapsed_line = nil
 					  DrawTooltip(display)
 				  end
