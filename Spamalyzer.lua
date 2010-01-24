@@ -107,6 +107,7 @@ local COLOR_YELLOW	= "|cffffff00"
 -------------------------------------------------------------------------------
 local players = {}
 local sorted_data = {}
+local activity = {}		-- Messages/bytes in/out
 
 local db
 local output_frame
@@ -376,6 +377,15 @@ local function StoreMessage(prefix, message, type, origin, target)
 		source.messages = (source.messages or 0) + 1
 	end
 
+	if origin == MY_NAME then
+		activity.output = (activity.output or 0) + bytes
+		activity.sent = (activity.sent or 0) + 1
+	else
+		activity.input = (activity.input or 0) + bytes
+		activity.received = (activity.received or 0) + 1
+	end
+	activity.bytes = (activity.bytes or 0) + bytes
+	activity.messages = (activity.messages or 0) + 1
 	if LDB_anchor and tooltip and tooltip:IsVisible() then
 		DrawTooltip(LDB_anchor)
 	end
