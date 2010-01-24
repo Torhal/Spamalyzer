@@ -117,8 +117,6 @@ do
 
 	local SetElapsedLine
 	do
-		local last_update = GetTime()
-
 		local function TimeStr(val)
 			local tm = tonumber(val)
 
@@ -134,6 +132,8 @@ do
 			seconds = seconds > 0 and (seconds.."s") or ""
 			return hours..minutes..seconds
 		end
+		local last_update = GetTime()
+		local time_str = TimeStr(last_update - epoch)	-- Cached value used between updates.
 
 		function SetElapsedLine()
 			if not elapsed_line then
@@ -142,11 +142,14 @@ do
 			local now = GetTime()
 
 			if now - last_update < 1 then
+				tooltip:SetCell(elapsed_line, NUM_COLUMNS, time_str)
 				return
 			end
 			last_update = now
+			time_str = TimeStr(now - epoch)
 
-			tooltip:SetCell(elapsed_line, NUM_COLUMNS, TimeStr(now - epoch))
+			tooltip:SetCell(elapsed_line, NUM_COLUMNS, time_str
+)
 		end
 	end
 
