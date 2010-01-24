@@ -32,7 +32,7 @@ local L			= LibStub("AceLocale-3.0"):GetLocale(ADDON_NAME)
 local defaults = {
 	global = {
 		datafeed = {
-			display		= 1,	-- Message count
+			display		= 1,	-- Output (in bytes)
 			minimap_icon	= {
 				hide	= false,
 			},
@@ -60,6 +60,15 @@ local SORT_VALUES = {
 	[1]	= _G.NAME,
 	[2]	= L["Bytes"],
 	[3]	= L["Messages"],
+}
+
+local DISPLAY_NAMES = {
+	[1]	= L["Output"],
+	[2]	= L["Input"],
+	[3]	= L["Bytes"],
+	[4]	= L["Sent"],
+	[5]	= L["Received"],
+	[6]	= L["Messages"],
 }
 
 local DISPLAY_VALUES = {
@@ -467,7 +476,7 @@ local function GetOptions()
 									  db.datafeed.display = value
 									  data_obj.text = DISPLAY_VALUES[value]
 								  end,
-							values	= DISPLAY_VALUES,
+							values	= DISPLAY_NAMES,
 						},
 						minimap_icon = {
 							order	= 20,
