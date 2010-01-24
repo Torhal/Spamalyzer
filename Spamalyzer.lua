@@ -236,6 +236,12 @@ do
 		DrawTooltip(LDB_anchor)
 	end
 
+	local function SortOnMouseUp(cell, sort_func)
+		db.tooltip.sorting = sort_func
+		table.sort(sorted_data, SORT_FUNCS[sort_func])
+		DrawTooltip(LDB_anchor)
+	end
+
 	function DrawTooltip(anchor)
 		LDB_anchor = anchor
 
@@ -265,6 +271,10 @@ do
 		end
 		line = tooltip:AddLine(" ", " ", L["Messages"], L["Bytes"])
 		tooltip:SetCell(line, 1, _G.NAME, "LEFT", 2)
+
+		tooltip:SetCellScript(line, 1, "OnMouseUp", SortOnMouseUp, 1)
+		tooltip:SetCellScript(line, 3, "OnMouseUp", SortOnMouseUp, 3)
+		tooltip:SetCellScript(line, 4, "OnMouseUp", SortOnMouseUp, 2)
 
 		-- If there is new activity, re-sort the data.
 		if new_activity then
