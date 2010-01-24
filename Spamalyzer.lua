@@ -150,6 +150,7 @@ local data_obj
 local LDB_anchor
 local tooltip
 local elapsed_line
+local new_activity
 
 local function UpdateDataFeed(value)
 	data_obj.text = DISPLAY_NAMES[value]..": "..(activity[DISPLAY_VALUES[value]] or _G.NONE)
@@ -265,6 +266,12 @@ do
 		line = tooltip:AddLine(" ", " ", L["Messages"], L["Bytes"])
 		tooltip:SetCell(line, 1, _G.NAME, "LEFT", 2)
 
+		-- If there is new activity, re-sort the data.
+		if new_activity then
+			table.sort(sorted_data, SORT_FUNCS[db.tooltip.sorting])
+			new_activity = false
+		end
+
 		for index, entry in ipairs(sorted_data) do
 			local toggled = entry.toggled
 
@@ -375,6 +382,8 @@ local function StoreMessage(prefix, message, type, origin, target)
 	local known = addon_name and true or false	-- If addon_name is nil, we didn't find a match.
 	addon_name = addon_name or prefix		-- Ensure that addon_name is not nil.
 
+	new_activity = true				-- Makes sure we re-sort the tooltip.
+
 	local player = players[origin]
 
 	if not player then
@@ -392,7 +401,6 @@ local function StoreMessage(prefix, message, type, origin, target)
 			["known"]	= known,
 		}
 		table.insert(sorted_data, player)
-		table.sort(sorted_data, SORT_FUNCS[db.tooltip.sorting])
 
 		players[origin] = player
 	else
