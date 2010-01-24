@@ -278,7 +278,7 @@ do
 			line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", entry.messages, entry.output)
 			tooltip:SetCell(line, 2, string.format("|cff%s%s|r", CLASS_COLORS[entry.class] or "cccccc", entry.name), "LEFT")
 
-			tooltip:SetCellScript(line, 1, "OnMouseUp", NameOnMouseUp, index)
+			tooltip:SetLineScript(line, "OnMouseUp", NameOnMouseUp, index)
 
 			if toggled then
 				for addon, data in pairs(entry.sources) do
