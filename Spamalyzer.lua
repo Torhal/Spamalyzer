@@ -72,10 +72,12 @@ local DISPLAY_NAMES = {
 }
 
 local DISPLAY_VALUES = {
-	[1]	= L["Sent"],
-	[2]	= L["Received"],
-	[3]	= L["Bytes Out"],
-	[4]	= L["Bytes In"],
+	[1]	= "output",
+	[2]	= "input",
+	[3]	= "bytes",
+	[4]	= "sent",
+	[5]	= "received",
+	[6]	= "messages",
 }
 
 local CHAT_FRAME_MAP = {
