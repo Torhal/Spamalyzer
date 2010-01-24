@@ -439,14 +439,28 @@ function Spamalyzer:OnEnable()
 					  else
 						  InterfaceOptionsFrame_OpenToCategory(Spamalyzer.options_frame)
 					  end
-				  elseif button == "LeftButton" and IsShiftKeyDown() then
-					  while #sorted_data >= 1 do
-						  table.remove(sorted_data)
-					  end
-					  table.wipe(players)
+				  elseif button == "LeftButton" then
+					  if IsShiftKeyDown() then
+						  while #sorted_data >= 1 do
+							  table.remove(sorted_data)
+						  end
+						  table.wipe(players)
+						  table.wipe(activity)
 
-					  elapsed_line = nil
-					  DrawTooltip(display)
+						  epoch = GetTime()
+						  elapsed_line = nil
+						  DrawTooltip(display)
+					  else
+						  local cur_val = db.datafeed.display
+
+						  if cur_val == 6 then
+							  cur_val = 1
+						  else
+							  cur_val = math.max(1, math.min(6, cur_val + 1))
+						  end
+						  db.datafeed.display = cur_val
+						  UpdateDataFeed(cur_val)
+					  end
 				  end
 			  end,
 	})
