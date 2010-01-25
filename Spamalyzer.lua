@@ -51,6 +51,7 @@ local defaults = {
 		},
 		tooltip = {
 			hide_hint	= false,
+			show_stats	= false,
 			scale		= 1,
 			sorting		= 1,	-- Name
 			timer		= 0.25,
@@ -309,8 +310,17 @@ do
 		tooltip:SetCell(elapsed_line, 1, _G.TIME_ELAPSED, "LEFT", 3)
 		SetElapsedLine()
 
+		if db.tooltip.show_stats then
+			tooltip:AddSeparator()
+
+			for index, name in ipairs(DISPLAY_NAMES) do
+				line = tooltip:AddLine(" ", " ", " ", activity[DISPLAY_VALUES[index]])
+				tooltip:SetCell(line, 1, name, "LEFT", 2)
+			end
+		end
+
 		if not db.tooltip.hide_hint then
-			tooltip:AddLine(" ")
+			tooltip:AddSeparator()
 
 			line = tooltip:AddLine()
 			tooltip:SetCell(line, 1, L["Left-click to change datafeed type."], "LEFT", NUM_COLUMNS)
@@ -321,6 +331,7 @@ do
 			line = tooltip:AddLine()
 			tooltip:SetCell(line, 1, L["Right-click for options."], "LEFT", NUM_COLUMNS)
 		end
+		tooltip:UpdateScrolling()
 		tooltip:Show()
 		updater:Show()
 	end
@@ -729,8 +740,17 @@ local function GetOptions()
 									  db.tooltip.hide_hint = value
 								  end,
 						},
+						show_stats = {
 							order	= 40,
+							type	= "toggle",
+							width	= "full",
+							name	= _G.STATISTICS,
+							desc	= L["Show traffic statistics at the bottom of the tooltip."],
+							get	= function()
+									  return db.tooltip.show_stats
+								  end,
 							set	= function(info, value)
+									  db.tooltip.show_stats = value
 								  end,
 						},
 					},
