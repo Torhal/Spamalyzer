@@ -424,7 +424,12 @@ local function StoreMessage(prefix, message, type, origin, target)
 	addon_name = addon_name or prefix	-- Ensure that addon_name is not nil.
 	new_activity = true			-- Makes sure we re-sort the tooltip.
 
-	local player = players[origin]
+	local player_name, realm = string.split("-", origin, 2)
+
+	-- If the player is on the current realm, player_name will be nil - set it as origin.
+	player_name = player_name or origin
+
+	local player = players[player_name]
 
 	if not player then
 		player = {
@@ -442,7 +447,7 @@ local function StoreMessage(prefix, message, type, origin, target)
 		}
 		table.insert(sorted_data, player)
 
-		players[origin] = player
+		players[player_name] = player
 	else
 		player.messages = player.messages + 1
 		player.output = player.output + bytes
