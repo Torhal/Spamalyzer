@@ -142,12 +142,13 @@ local epoch = GetTime()
 -------------------------------------------------------------------------------
 local DrawTooltip		-- Upvalue needed for chicken-or-egg-syndrome.
 
-local updater
 local data_obj
 local LDB_anchor
 local tooltip
-local elapsed_line
-local new_activity
+
+local updater			-- OnUpdate frame for tooltip refreshing/hiding.
+local elapsed_line		-- Line in the tooltip where the elapsed time resides.
+local new_activity		-- If true, re-sort sort_data during DrawTooltip()
 
 local function UpdateDataFeed(value)
 	data_obj.text = DISPLAY_NAMES[value]..": "..(activity[DISPLAY_VALUES[value]] or _G.NONE)
@@ -189,11 +190,9 @@ do
 			last_update = now
 			time_str = TimeStr(now - epoch)
 
-			tooltip:SetCell(elapsed_line, NUM_COLUMNS, time_str
-)
+			tooltip:SetCell(elapsed_line, NUM_COLUMNS, time_str)
 		end
 	end
-
 	local last_update = 0
 	local check_update = 0
 
@@ -224,9 +223,6 @@ do
 				  end
 				  check_update = 0
 			  end)
-
-	local ICON_PLUS		= [[|TInterface\BUTTONS\UI-PlusButton-Up:20:20|t]]
-	local ICON_MINUS	= [[|TInterface\BUTTONS\UI-MinusButton-Up:20:20|t]]
 
 	local function NameOnMouseUp(cell, index)
 		sorted_data[index].toggled = not sorted_data[index].toggled
@@ -278,6 +274,8 @@ do
 			table.sort(sorted_data, SORT_FUNCS[db.tooltip.sorting])
 			new_activity = false
 		end
+		local ICON_PLUS		= [[|TInterface\BUTTONS\UI-PlusButton-Up:20:20|t]]
+		local ICON_MINUS	= [[|TInterface\BUTTONS\UI-MinusButton-Up:20:20|t]]
 
 		for index, entry in ipairs(sorted_data) do
 			local toggled = entry.toggled
@@ -357,7 +355,7 @@ local function StoreMessage(prefix, message, type, origin, target)
 	elseif prefix:match("^CC_") then
 		addon_name = "ClassChannels"
 	else
-		-- Try escaping it and testing for AceComm-3.0 multi-part
+		-- Try escaping it and testing for AceComm-3.0 multi-part.
 		local escaped_prefix = prefix:gsub("[%c\092\128-\255]", EscapeChar)
 
 		if escaped_prefix:match(".-\\%d%d%d") then
@@ -367,7 +365,7 @@ local function StoreMessage(prefix, message, type, origin, target)
 				addon_name = KNOWN_PREFIXES[matched_prefix]
 			end
 		end
-		-- Cache this in the prefix table
+		-- Cache this in the prefix table.
 		KNOWN_PREFIXES[prefix] = addon_name
 	end
 
