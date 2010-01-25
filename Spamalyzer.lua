@@ -392,26 +392,28 @@ local function StoreMessage(prefix, message, type, origin, target)
 	local tracking = db.tracking[type:lower()]
 
 	if output_frame and ((known and db.general.display_known) or (not known and db.general.display_unknown)) then
-		local color = (not db.tracking[type:lower()]) and COLOR_PINK or COLOR_PALE_GREEN
-		local display_name = addon_name and (addon_name.." ("..prefix..")") or prefix
+		local color = tracking and COLOR_PALE_GREEN or COLOR_PINK
+		local display_name = addon_name or _G.UNKNOWN
+		local display_color = known and COLOR_GREEN or COLOR_RED
 
 		message = message or ""
 		target = target and (" to "..target..", from ") or ""
 
+		output_frame:AddMessage(string.format("%s%s|r: %s[%s][%s][%s]|r%s%s[%s]|r",
+						      display_color, display_name, color, prefix, message, type, target, color, origin))
+	end
+
 	-- Not tracking data from this message type, so stop here.
 	if not tracking then
 		return
-		output_frame:AddMessage(string.format("%s[%s][%s][%s]|r%s%s[%s]|r",
-						      color, display_name, message, type, target, color, origin))
 	end
 	local bytes = string.len(prefix) + string.len(message)
 
 	if bytes == 0 then
 		return
 	end
-	addon_name = addon_name or prefix		-- Ensure that addon_name is not nil.
-
-	new_activity = true				-- Makes sure we re-sort the tooltip.
+	addon_name = addon_name or prefix	-- Ensure that addon_name is not nil.
+	new_activity = true			-- Makes sure we re-sort the tooltip.
 
 	local player = players[origin]
 
