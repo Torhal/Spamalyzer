@@ -553,11 +553,15 @@ function Spamalyzer:OnEnable()
 					  end
 				  elseif button == "LeftButton" then
 					  if IsShiftKeyDown() then
-						  while #sorted_data >= 1 do
-							  table.remove(sorted_data)
-						  end
+						  table.wipe(sorted_data)
 						  table.wipe(players)
-						  table.wipe(activity)
+
+						  activity.output = 0
+						  activity.input = 0
+						  activity.bytes = 0
+						  activity.sent = 0
+						  activity.received = 0
+						  activity.messages = 0
 
 						  epoch = GetTime()
 						  elapsed_line = nil
