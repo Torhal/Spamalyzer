@@ -541,27 +541,15 @@ local function GetOptions()
 			type = "group",
 			args = {
 				-------------------------------------------------------------------------------
-				-- Datafeed options.
+				-- General options.
 				-------------------------------------------------------------------------------
-				datafeed = {
-					name	= L["Datafeed"],
+				general = {
+					name	= _G.GENERAL_LABEL,
 					order	= 10,
 					type	= "group",
 					args	= {
-						display = {
-							order	= 10,
-							type	= "select",
-							name	= _G.DISPLAY_LABEL,
-							desc	= "",
-							get	= function() return db.datafeed.display end,
-							set	= function(info, value)
-									  db.datafeed.display = value
-									  UpdateDataFeed(value)
-								  end,
-							values	= DISPLAY_NAMES,
-						},
 						minimap_icon = {
-							order	= 20,
+							order	= 10,
 							type	= "toggle",
 							width	= "full",
 							name	= L["Minimap Icon"],
@@ -575,22 +563,19 @@ local function GetOptions()
 									  LDBIcon[value and "Show" or "Hide"](LDBIcon, ADDON_NAME)
 								  end,
 						},
-					}
-				},
-				-------------------------------------------------------------------------------
-				-- General options.
-				-------------------------------------------------------------------------------
-				general = {
-					name	= _G.GENERAL_LABEL,
-					order	= 20,
-					type	= "group",
-					args	= {
+						spacer1 = {
+							order	= 11,
+							type	= "description",
+							name	= "\n",
+						},
 						display_frame = {
 							order	= 20,
 							type	= "select",
 							name	= _G.DISPLAY_OPTIONS,
 							desc	= L["Secondary location to display AddOn messages."],
-							get	= function() return db.general.display_frame end,
+							get	= function()
+									  return db.general.display_frame
+								  end,
 							set	= function(info, value)
 									  db.general.display_frame = value
 									  output_frame = CHAT_FRAME_MAP[value]
@@ -645,7 +630,6 @@ local function GetOptions()
 						battleground = {
 							order	= 10,
 							type	= "toggle",
-							width	= "full",
 							name	= _G.BATTLEGROUND,
 							desc	= string.format(L["Toggle recording of %s AddOn messages."], _G.BATTLEGROUND),
 							get	= function() return db.tracking.battleground end,
@@ -654,7 +638,6 @@ local function GetOptions()
 						guild = {
 							order	= 20,
 							type	= "toggle",
-							width	= "full",
 							name	= _G.GUILD,
 							desc	= string.format(L["Toggle recording of %s AddOn messages."], _G.GUILD),
 							get	= function() return db.tracking.guild end,
@@ -663,7 +646,6 @@ local function GetOptions()
 						party = {
 							order	= 30,
 							type	= "toggle",
-							width	= "full",
 							name	= _G.PARTY,
 							desc	= string.format(L["Toggle recording of %s AddOn messages."], _G.PARTY),
 							get	= function() return db.tracking.party end,
@@ -672,7 +654,6 @@ local function GetOptions()
 						raid = {
 							order	= 40,
 							type	= "toggle",
-							width	= "full",
 							name	= _G.RAID,
 							desc	= string.format(L["Toggle recording of %s AddOn messages."], _G.RAID),
 							get	= function() return db.tracking.raid end,
@@ -681,7 +662,6 @@ local function GetOptions()
 						whisper	= {
 							order	= 50,
 							type	= "toggle",
-							width	= "full",
 							name	= _G.WHISPER,
 							desc	= string.format(L["Toggle recording of %s AddOn messages."], _G.WHISPER),
 							get	= function() return db.tracking.whisper end,
@@ -732,6 +712,7 @@ local function GetOptions()
 						hide_hint = {
 							order	= 30,
 							type	= "toggle",
+							width	= "full",
 							name	= L["Hide Hint Text"],
 							desc	= L["Hides the hint text at the bottom of the tooltip."],
 							get	= function()
@@ -741,17 +722,9 @@ local function GetOptions()
 									  db.tooltip.hide_hint = value
 								  end,
 						},
-						sorting	= {
 							order	= 40,
-							type	= "select",
-							name	= L["Sort By"],
-							desc	= L["Method to use when sorting entries in the tooltip."],
-							get	= function() return db.tooltip.sorting end,
 							set	= function(info, value)
-									  db.tooltip.sorting = value
-									  table.sort(sorted_data, SORT_FUNCS[value])
 								  end,
-							values	= SORT_VALUES,
 						},
 					},
 				},
