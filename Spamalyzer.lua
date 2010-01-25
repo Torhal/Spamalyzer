@@ -184,7 +184,6 @@ local tooltip
 
 local updater			-- OnUpdate frame for tooltip refreshing/hiding.
 local elapsed_line		-- Line in the tooltip where the elapsed time resides.
-local new_activity		-- If true, re-sort sort_data during DrawTooltip()
 
 local function UpdateDataFeed()
 	local value = db.datafeed.display
@@ -262,7 +261,8 @@ do
 			  end)
 
 	local function NameOnMouseUp(cell, index)
-		sorted_data[index].toggled = not sorted_data[index].toggled
+		local player = players[sorted_data[index]]
+		player.toggled = not player.toggled
 		DrawTooltip(LDB_anchor)
 	end
 
@@ -314,24 +314,24 @@ do
 		tooltip:SetCellScript(line, 3, "OnMouseUp", SortOnMouseUp, 3)
 		tooltip:SetCellScript(line, 4, "OnMouseUp", SortOnMouseUp, 2)
 
-		-- If there is new activity, re-sort the data.
-		if new_activity then
-			table.sort(sorted_data, SORT_FUNCS[db.tooltip.sorting])
-			new_activity = false
-		end
 		local ICON_PLUS		= [[|TInterface\BUTTONS\UI-PlusButton-Up:20:20|t]]
 		local ICON_MINUS	= [[|TInterface\BUTTONS\UI-MinusButton-Up:20:20|t]]
 
-		for index, entry in ipairs(sorted_data) do
-			local toggled = entry.toggled
+		if #sorted_data > 1 then
+			table.sort(sorted_data, SORT_FUNCS[db.tooltip.sorting])
+		end
 
-			line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", entry.messages, entry.output)
-			tooltip:SetCell(line, 2, string.format("|cff%s%s|r", CLASS_COLORS[entry.class] or "cccccc", entry.name), "LEFT")
+		for index, entry in ipairs(sorted_data) do
+			local player = players[entry]
+			local toggled = player.toggled
+
+			line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", player.messages, player.output)
+			tooltip:SetCell(line, 2, string.format("|cff%s%s|r", CLASS_COLORS[player.class] or "cccccc", player.name), "LEFT")
 
 			tooltip:SetLineScript(line, "OnMouseUp", NameOnMouseUp, index)
 
 			if toggled then
-				for addon, data in pairs(entry.sources) do
+				for addon, data in pairs(player.sources) do
 					local color = data.known and COLOR_GREEN or COLOR_RED
 
 					line = tooltip:AddLine(" ", " ", data.messages, data.output)
@@ -448,7 +448,6 @@ local function StoreMessage(prefix, message, type, origin, target)
 		return
 	end
 	addon_name = addon_name or prefix	-- Ensure that addon_name is not nil.
-	new_activity = true			-- Makes sure we re-sort the tooltip.
 
 	local player_name, realm = string.split("-", origin, 2)
 
@@ -471,9 +470,8 @@ local function StoreMessage(prefix, message, type, origin, target)
 				}
 			}
 		}
-		table.insert(sorted_data, player)
-
 		players[player_name] = player
+		table.insert(sorted_data, player_name)
 	else
 		player.messages = player.messages + 1
 		player.output = player.output + bytes
