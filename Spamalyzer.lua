@@ -39,6 +39,8 @@ local defaults = {
 		},
 		general = {
 			display_frame	= 1,	-- None
+			display_known	= true,
+			display_unknown	= true,
 		},
 		tracking = {
 			battleground	= false,
@@ -368,8 +370,9 @@ local function StoreMessage(prefix, message, type, origin, target)
 		-- Cache this in the prefix table.
 		KNOWN_PREFIXES[prefix] = addon_name
 	end
+	local known = addon_name and true or false	-- If addon_name is nil, we didn't find a match.
 
-	if output_frame then
+	if output_frame and ((known and db.general.display_known) or (not known and db.general.display_unknown)) then
 		local color = (not db.tracking[type:lower()]) and COLOR_PINK or COLOR_PALE_GREEN
 		local display_name = addon_name and (addon_name.." ("..prefix..")") or prefix
 
@@ -602,6 +605,32 @@ local function GetOptions()
 								[7]	= L["ChatFrame6"],
 								[8]	= L["ChatFrame7"],
 							},
+						},
+						display_known = {
+							order	= 30,
+							type	= "toggle",
+							width	= "full",
+							name	= L["Display Known"],
+							desc	= L["Display messages from known AddOns in the ChatFrame."],
+							get	= function()
+									  return db.general.display_known
+								  end,
+							set	= function(info, value)
+									  db.general.display_known = value
+								  end,
+						},
+						display_unknown = {
+							order	= 40,
+							type	= "toggle",
+							width	= "full",
+							name	= L["Display Unknown"],
+							desc	= L["Display messages from unknown AddOns in the ChatFrame."],
+							get	= function()
+									  return db.general.display_unknown
+								  end,
+							set	= function(info, value)
+									  db.general.display_unknown = value
+								  end,
 						},
 					},
 				},
