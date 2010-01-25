@@ -231,6 +231,7 @@ do
 	end
 	local last_update = 0
 	local check_update = 0
+	local pending_refresh = false
 
 	updater = CreateFrame("Frame", nil, UIParent)
 	updater:Hide()
@@ -246,7 +247,14 @@ do
 
 				  if tooltip:IsMouseOver() or (LDB_anchor and LDB_anchor:IsMouseOver()) then
 					  SetElapsedLine()
-					  last_update = 0
+
+					  if not pending_refresh then
+						  last_update = 0
+					  else
+						  if last_update >= 0.25 then
+							  DrawTooltip(LDB_anchor)
+						  end
+					  end
 				  else
 					  last_update = last_update + check_update
 
@@ -283,7 +291,13 @@ do
 				-- Pass true as second parameter because hooking OnHide causes C stack overflows
 				TipTac:AddModifiedTip(tooltip, true)
 			end
+		elseif not pending_refresh then
+			pending_refresh = true
+			return
+		else
+			pending_refresh = false
 		end
+
 		tooltip:Clear()
 		tooltip:SmartAnchorTo(anchor)
 		tooltip:SetScale(db.tooltip.scale)
