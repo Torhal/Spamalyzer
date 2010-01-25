@@ -186,7 +186,8 @@ local updater			-- OnUpdate frame for tooltip refreshing/hiding.
 local elapsed_line		-- Line in the tooltip where the elapsed time resides.
 local new_activity		-- If true, re-sort sort_data during DrawTooltip()
 
-local function UpdateDataFeed(value)
+local function UpdateDataFeed()
+	local value = db.datafeed.display
 	data_obj.text = DISPLAY_NAMES[value]..": "..(activity[DISPLAY_VALUES[value]] or _G.NONE)
 end
 
@@ -502,7 +503,7 @@ local function StoreMessage(prefix, message, type, origin, target)
 	activity.bytes = activity.bytes + bytes
 	activity.messages = activity.messages + 1
 
-	UpdateDataFeed(db.datafeed.display)
+	UpdateDataFeed()
 
 	if LDB_anchor and tooltip and tooltip:IsVisible() then
 		DrawTooltip(LDB_anchor)
@@ -561,6 +562,7 @@ function Spamalyzer:OnEnable()
 						  epoch = GetTime()
 						  elapsed_line = nil
 						  DrawTooltip(display)
+						  UpdateDataFeed()
 					  else
 						  local cur_val = db.datafeed.display
 
@@ -570,12 +572,12 @@ function Spamalyzer:OnEnable()
 							  cur_val = math.max(1, math.min(6, cur_val + 1))
 						  end
 						  db.datafeed.display = cur_val
-						  UpdateDataFeed(cur_val)
+						  UpdateDataFeed()
 					  end
 				  end
 			  end,
 	})
-	UpdateDataFeed(db.datafeed.display)
+	UpdateDataFeed()
 
 	self:RegisterEvent("CHAT_MSG_ADDON")
 	self:SecureHook("SendAddonMessage")
