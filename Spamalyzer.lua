@@ -389,6 +389,7 @@ local function StoreMessage(prefix, message, type, origin, target)
 		KNOWN_PREFIXES[prefix] = addon_name
 	end
 	local known = addon_name and true or false	-- If addon_name is nil, we didn't find a match.
+	local tracking = db.tracking[type:lower()]
 
 	if output_frame and ((known and db.general.display_known) or (not known and db.general.display_unknown)) then
 		local color = (not db.tracking[type:lower()]) and COLOR_PINK or COLOR_PALE_GREEN
@@ -397,6 +398,9 @@ local function StoreMessage(prefix, message, type, origin, target)
 		message = message or ""
 		target = target and (" to "..target..", from ") or ""
 
+	-- Not tracking data from this message type, so stop here.
+	if not tracking then
+		return
 		output_frame:AddMessage(string.format("%s[%s][%s][%s]|r%s%s[%s]|r",
 						      color, display_name, message, type, target, color, origin))
 	end
@@ -405,7 +409,6 @@ local function StoreMessage(prefix, message, type, origin, target)
 	if bytes == 0 then
 		return
 	end
-	local known = addon_name and true or false	-- If addon_name is nil, we didn't find a match.
 	addon_name = addon_name or prefix		-- Ensure that addon_name is not nil.
 
 	new_activity = true				-- Makes sure we re-sort the tooltip.
