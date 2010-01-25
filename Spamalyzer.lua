@@ -260,6 +260,13 @@ do
 		if #sorted_data == 0 then
 			line = tooltip:AddLine()
 			tooltip:SetCell(line, 1, _G.EMPTY, "CENTER", NUM_COLUMNS)
+			tooltip:AddLine(" ")
+
+			elapsed_line = tooltip:AddLine()
+			tooltip:SetCell(elapsed_line, 1, _G.TIME_ELAPSED, "LEFT", 3)
+
+			SetElapsedLine()
+
 			tooltip:Show()
 			updater:Show()
 			return
