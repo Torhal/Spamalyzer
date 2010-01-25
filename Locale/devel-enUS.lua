@@ -14,10 +14,11 @@ L["ChatFrame5"]							= true
 L["ChatFrame6"]							= true
 L["ChatFrame7"]							= true
 
-L["Datafeed"]							= true
+L["Display Known"]						= true
+L["Display Unknown"]						= true
+L["Display messages from known AddOns in the ChatFrame."]	= true
+L["Display messages from unknown AddOns in the ChatFrame."]	= true
 L["Draws the icon on the minimap."]				= true
-
-L["Timer"]							= true
 
 L["Hide Hint Text"]						= true
 L["Hides the hint text at the bottom of the tooltip."]		= true
@@ -27,7 +28,6 @@ L["Input"]							= true
 L["Left-click to change datafeed type."]			= true
 
 L["Messages"]							= true
-L["Method to use when sorting entries in the tooltip."]		= true
 L["Minimap Icon"]						= true
 L["Move the slider to adjust the scale of the tooltip."]	= true
 L["Move the slider to adjust the tooltip fade time."]		= true
@@ -41,8 +41,9 @@ L["Scale"]							= true
 L["Secondary location to display AddOn messages."]		= true
 L["Sent"]							= true
 L["Shift+Left-click to clear data."]				= true
-L["Sort By"]							= true
+L["Show traffic statistics at the bottom of the tooltip."]	= true
 
+L["Timer"]							= true
 L["Toggle recording of %s AddOn messages."]			= true
 L["Tooltip"]							= true
 L["Tracking"]							= true
