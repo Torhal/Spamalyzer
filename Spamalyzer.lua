@@ -27,6 +27,26 @@ local LDBIcon		= LibStub("LibDBIcon-1.0")
 local L			= LibStub("AceLocale-3.0"):GetLocale(ADDON_NAME)
 
 -------------------------------------------------------------------------------
+-- Variables.
+-------------------------------------------------------------------------------
+local players = {}		-- List of players and their data.
+local sorted_data = {}
+
+-- Messages/bytes in/out
+local activity = {
+	["output"]	= 0,
+	["input"]	= 0,
+	["bytes"]	= 0,
+	["sent"]	= 0,
+	["received"]	= 0,
+	["messages"]	= 0,
+}
+
+local db
+local output_frame
+local epoch = GetTime()
+
+-------------------------------------------------------------------------------
 -- Constants.
 -------------------------------------------------------------------------------
 local defaults = {
@@ -128,17 +148,6 @@ SORT_FUNCS = {
 			  return a.messages > b.messages
 		  end
 }
-
--------------------------------------------------------------------------------
--- Variables.
--------------------------------------------------------------------------------
-local players = {}		-- List of players and their data.
-local sorted_data = {}
-local activity = {}		-- Messages/bytes in/out
-
-local db
-local output_frame
-local epoch = GetTime()
 
 -------------------------------------------------------------------------------
 -- Tooltip and Databroker methods.
@@ -452,14 +461,14 @@ local function StoreMessage(prefix, message, type, origin, target)
 	end
 
 	if origin == MY_NAME then
-		activity.output = (activity.output or 0) + bytes
-		activity.sent = (activity.sent or 0) + 1
+		activity.output = activity.output + bytes
+		activity.sent = activity.sent + 1
 	else
-		activity.input = (activity.input or 0) + bytes
-		activity.received = (activity.received or 0) + 1
+		activity.input = activity.input + bytes
+		activity.received = activity.received + 1
 	end
-	activity.bytes = (activity.bytes or 0) + bytes
-	activity.messages = (activity.messages or 0) + 1
+	activity.bytes = activity.bytes + bytes
+	activity.messages = activity.messages + 1
 
 	UpdateDataFeed(db.datafeed.display)
 
