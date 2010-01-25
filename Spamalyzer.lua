@@ -437,13 +437,13 @@ local function StoreMessage(prefix, message, type, origin, target)
 			["name"]	= origin,
 			["messages"]	= 1,
 			["output"]	= bytes,
-			["sources"]	= {}
-		}
-
-		player.sources[addon_name] = {
-			["messages"]	= 1,
-			["output"]	= bytes,
-			["known"]	= known,
+			["sources"]	= {
+				[addon_name] = {
+					["messages"]	= 1,
+					["output"]	= bytes,
+					["known"]	= known,
+				}
+			}
 		}
 		table.insert(sorted_data, player)
 
@@ -457,12 +457,14 @@ local function StoreMessage(prefix, message, type, origin, target)
 
 		if not source then
 			source = {
-				["known"] = known
+				["known"]	= known,
+				["messages"]	= 0,
+				["output"]	= 0,
 			}
 			player.sources[addon_name] = source
 		end
-		source.output = (source.output or 0) + bytes
-		source.messages = (source.messages or 0) + 1
+		source.output = source.output + bytes
+		source.messages = source.messages + 1
 	end
 
 	if origin == MY_NAME then
