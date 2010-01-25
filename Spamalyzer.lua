@@ -58,7 +58,7 @@ local defaults = {
 			},
 		},
 		general = {
-			display_frame	= 1,	-- None
+			display_frame	= 1,	-- None.
 			display_known	= true,
 			display_unknown	= true,
 		},
@@ -73,7 +73,8 @@ local defaults = {
 			hide_hint	= false,
 			show_stats	= false,
 			scale		= 1,
-			sorting		= 1,	-- Name
+			sorting		= 1,	-- Name.
+			sort_ascending	= true,
 			timer		= 0.25,
 		},
 	}
@@ -129,23 +130,46 @@ for k, v in pairs(COLOR_TABLE) do
 	CLASS_COLORS[k] = string.format("%2x%2x%2x", v.r * 255, v.g * 255, v.b * 255)
 end
 
-local SORT_FUNCS	-- Required for recursion, since the table is referenced within its own definition.
-
-SORT_FUNCS = {
+local SORT_FUNCS = {
 	[1]	= function(a, b)	-- Name
-			  return a.name < b.name
+			  local player_a, player_b = players[a], players[b]
+
+			  if db.tooltip.sort_ascending then
+				  return player_a.name < player_b.name
+			  end
+			  return player_a.name > player_b.name
 		  end,
+
 	[2]	= function(a, b)	-- Bytes
-			  if a.output == b.output then
-				  return SORT_FUNCS[1](a, b)
+			  local player_a, player_b = players[a], players[b]
+
+			  if player_a.output == player_b.output then
+				  if db.tooltip.sort_ascending then
+					  return player_a.name < player_b.name
+				  end
+				  return player_a.name > player_b.name
 			  end
-			  return a.output > b.output
+
+			  if db.tooltip.sort_ascending then
+				  return player_a.output < player_b.output
+			  end
+			  return player_a.output > player_b.output
 		  end,
+
 	[3]	= function(a, b)	-- Messages
-			  if a.messages == b.messages then
-				  return SORT_FUNCS[1](a, b)
+			  local player_a, player_b = players[a], players[b]
+
+			  if player_a.messages == player_b.messages then
+				  if db.tooltip.sort_ascending then
+					  return player_a.name < player_b.name
+				  end
+				  return player_a.name > player_b.name
 			  end
-			  return a.messages > b.messages
+
+			  if db.tooltip.sort_ascending then
+				  return player_a.messages < player_b.messages
+			  end
+			  return player_a.messages > player_b.messages
 		  end
 }
 
@@ -243,7 +267,8 @@ do
 
 	local function SortOnMouseUp(cell, sort_func)
 		db.tooltip.sorting = sort_func
-		table.sort(sorted_data, SORT_FUNCS[sort_func])
+		db.tooltip.sort_ascending = not db.tooltip.sort_ascending
+
 		DrawTooltip(LDB_anchor)
 	end
 
