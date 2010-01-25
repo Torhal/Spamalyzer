@@ -94,12 +94,9 @@ local CHAT_FRAME_MAP = {
 local MY_NAME		= UnitName("player")
 
 local COLOR_GREEN	= "|cff00ff00"
-local COLOR_GREY	= "|cffcccccc"
-local COLOR_ORANGE	= "|cffeda55f"
 local COLOR_PALE_GREEN	= "|cffa3feba"
 local COLOR_PINK	= "|cffffbbbb"
 local COLOR_RED		= "|cffff0000"
-local COLOR_WHITE	= "|cffffffff"
 local COLOR_YELLOW	= "|cffffff00"
 
 local COLOR_TABLE = CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS
