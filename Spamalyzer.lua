@@ -297,7 +297,7 @@ do
 
 			if toggled then
 				for addon, data in pairs(entry.sources) do
-					local color = data.known and COLOR_GREEN or (addon:match("UNKNOWN") and COLOR_YELLOW or COLOR_RED)
+					local color = data.known and COLOR_GREEN or COLOR_RED
 
 					line = tooltip:AddLine(" ", " ", data.messages, data.output)
 					tooltip:SetCell(line, 2, string.format("%s%s|r", color, addon), "LEFT")
@@ -467,7 +467,7 @@ end
 -- Hooked functions.
 -------------------------------------------------------------------------------
 function Spamalyzer:SendAddonMessage(prefix, message, type, target)
-	if type == "WHISPER" and target and target ~= "" then
+	if target and target ~= "" and type == "WHISPER" then
 		StoreMessage(prefix, message, type, MY_NAME, target)
 	end
 end
