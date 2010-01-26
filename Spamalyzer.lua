@@ -29,9 +29,13 @@ local L			= LibStub("AceLocale-3.0"):GetLocale(ADDON_NAME)
 -------------------------------------------------------------------------------
 -- Variables.
 -------------------------------------------------------------------------------
-local players = {}		-- List of players and their data.
-local guild_members = {}	-- Guild cache, updated when GUILD_ROSTER_UPDATE fires.
-local sorted_players = {}
+local players		= {}	-- List of players and their data.
+local sorted_players	= {}
+
+local addons		= {}	-- List of AddOns and their data.
+local sorted_addons	= {}
+
+local guild_members	= {}	-- Guild cache, updated when GUILD_ROSTER_UPDATE fires.
 
 -- Messages/bytes in/out
 local activity = {
@@ -44,7 +48,7 @@ local activity = {
 }
 
 local db
-local output_frame
+local output_frame	-- ChatFrame to direct AddonMessages to.
 local epoch = GetTime()
 
 -------------------------------------------------------------------------------
