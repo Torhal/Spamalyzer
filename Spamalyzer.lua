@@ -246,14 +246,17 @@ do
 				  end
 
 				  if tooltip:IsMouseOver() or (LDB_anchor and LDB_anchor:IsMouseOver()) then
-					  SetElapsedLine()
+					  if pending_refresh then
+						  last_update = last_update + check_update
 
-					  if not pending_refresh then
-						  last_update = 0
-					  else
-						  if last_update >= 0.25 then
+						  if last_update >= 0.13 then
 							  DrawTooltip(LDB_anchor)
+							  pending_refresh = false
+							  last_update = 0
 						  end
+					  else
+						  SetElapsedLine()
+						  last_update = 0
 					  end
 				  else
 					  last_update = last_update + check_update
@@ -271,17 +274,17 @@ do
 	local function NameOnMouseUp(cell, index)
 		local player = players[sorted_data[index]]
 		player.toggled = not player.toggled
-		DrawTooltip(LDB_anchor)
+		DrawTooltip(LDB_anchor, true)
 	end
 
 	local function SortOnMouseUp(cell, sort_func)
 		db.tooltip.sorting = sort_func
 		db.tooltip.sort_ascending = not db.tooltip.sort_ascending
 
-		DrawTooltip(LDB_anchor)
+		DrawTooltip(LDB_anchor, true)
 	end
 
-	function DrawTooltip(anchor)
+	function DrawTooltip(anchor, refresh)
 		LDB_anchor = anchor
 
 		if not tooltip then
@@ -291,11 +294,9 @@ do
 				-- Pass true as second parameter because hooking OnHide causes C stack overflows
 				TipTac:AddModifiedTip(tooltip, true)
 			end
-		elseif not pending_refresh then
+		elseif refresh and not pending_refresh then
 			pending_refresh = true
 			return
-		else
-			pending_refresh = false
 		end
 
 		tooltip:Clear()
@@ -518,7 +519,7 @@ local function StoreMessage(prefix, message, type, origin, target)
 	UpdateDataFeed()
 
 	if LDB_anchor and tooltip and tooltip:IsVisible() then
-		DrawTooltip(LDB_anchor)
+		DrawTooltip(LDB_anchor, true)
 	end
 end
 
