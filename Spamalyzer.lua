@@ -30,6 +30,7 @@ local L			= LibStub("AceLocale-3.0"):GetLocale(ADDON_NAME)
 -- Variables.
 -------------------------------------------------------------------------------
 local players = {}		-- List of players and their data.
+local guild_members = {}	-- Guild cache, updated when GUILD_ROSTER_UPDATE fires.
 local sorted_players = {}
 
 -- Messages/bytes in/out
@@ -383,16 +384,8 @@ local function GetPlayerClass(player)
 		return class_english
 	end
 
-	if IsInGuild() then
-		for count = 1, GetNumGuildMembers(false), 1 do
-			local name, _, _, _, _, _, _, _, _, _, class = GetGuildRosterInfo(count)
-
-			if name == player then
-				return class
-			end
-		end
-	end
-	return nil
+	-- Last chance - check Guild.
+	return guild_members[player]
 end
 
 local function EscapeChar(c)
@@ -590,7 +583,13 @@ function Spamalyzer:OnEnable()
 	})
 	UpdateDataFeed()
 
+	-------------------------------------------------------------------------------
+	-- Cache guild information for later use.
+	-------------------------------------------------------------------------------
+	self:UpdateGuildInfo()
+
 	self:RegisterEvent("CHAT_MSG_ADDON")
+	self:RegisterEvent("GUILD_ROSTER_UPDATE", self.UpdateGuildInfo)
 	self:SecureHook("SendAddonMessage")
 
 	if LDBIcon then
@@ -600,6 +599,20 @@ end
 
 function Spamalyzer:OnDisable()
 end
+
+function Spamalyzer:UpdateGuildInfo()
+	if not IsInGuild() then
+		return
+	end
+	table.wipe(guild_members)
+
+	for count = 1, GetNumGuildMembers(false), 1 do
+		local name, _, _, _, _, _, _, _, _, _, class = GetGuildRosterInfo(count)
+
+		guild_members[name] = class
+	end
+end
+
 
 function Spamalyzer:CHAT_MSG_ADDON(event, prefix, message, channel, sender)
 	StoreMessage(prefix, message, channel, sender)
