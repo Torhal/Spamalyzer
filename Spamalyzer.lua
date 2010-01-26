@@ -20,7 +20,7 @@ local ADDON_NAME, namespace	= ...
 local KNOWN_PREFIXES		= namespace.prefixes
 
 local LibStub		= _G.LibStub
-local Spamalyzer	= LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceEvent-3.0", "AceHook-3.0")
+local Spamalyzer	= LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
 local LQT		= LibStub("LibQTip-1.0")
 local LDB		= LibStub("LibDataBroker-1.1")
 local LDBIcon		= LibStub("LibDBIcon-1.0")
@@ -130,49 +130,6 @@ for k, v in pairs(COLOR_TABLE) do
 	CLASS_COLORS[k] = string.format("%2x%2x%2x", v.r * 255, v.g * 255, v.b * 255)
 end
 
-local SORT_FUNCS = {
-	[1]	= function(a, b)	-- Name
-			  local player_a, player_b = players[a], players[b]
-
-			  if db.tooltip.sort_ascending then
-				  return player_a.name < player_b.name
-			  end
-			  return player_a.name > player_b.name
-		  end,
-
-	[2]	= function(a, b)	-- Bytes
-			  local player_a, player_b = players[a], players[b]
-
-			  if player_a.output == player_b.output then
-				  if db.tooltip.sort_ascending then
-					  return player_a.name < player_b.name
-				  end
-				  return player_a.name > player_b.name
-			  end
-
-			  if db.tooltip.sort_ascending then
-				  return player_a.output < player_b.output
-			  end
-			  return player_a.output > player_b.output
-		  end,
-
-	[3]	= function(a, b)	-- Messages
-			  local player_a, player_b = players[a], players[b]
-
-			  if player_a.messages == player_b.messages then
-				  if db.tooltip.sort_ascending then
-					  return player_a.name < player_b.name
-				  end
-				  return player_a.name > player_b.name
-			  end
-
-			  if db.tooltip.sort_ascending then
-				  return player_a.messages < player_b.messages
-			  end
-			  return player_a.messages > player_b.messages
-		  end
-}
-
 -------------------------------------------------------------------------------
 -- Tooltip and Databroker methods.
 -------------------------------------------------------------------------------
@@ -182,7 +139,6 @@ local data_obj
 local LDB_anchor
 local tooltip
 
-local updater			-- OnUpdate frame for tooltip refreshing/hiding.
 local elapsed_line		-- Line in the tooltip where the elapsed time resides.
 
 local function UpdateDataFeed()
@@ -210,81 +166,116 @@ do
 			seconds = seconds > 0 and (seconds.."s") or ""
 			return hours..minutes..seconds
 		end
-		local last_update = GetTime()
-		local time_str = TimeStr(last_update - epoch)	-- Cached value used between updates.
+		local time_str = TimeStr(GetTime() - epoch)	-- Cached value used between updates.
 
-		function SetElapsedLine()
+		function SetElapsedLine(use_cache)
 			if not elapsed_line then
 				return
 			end
-			local now = GetTime()
 
-			if now - last_update < 1 then
+			if use_cache then
 				tooltip:SetCell(elapsed_line, NUM_COLUMNS, time_str)
 				return
 			end
-			last_update = now
-			time_str = TimeStr(now - epoch)
+			time_str = TimeStr(GetTime() - epoch)
 
 			tooltip:SetCell(elapsed_line, NUM_COLUMNS, time_str)
 		end
-	end
-	local last_update = 0
-	local check_update = 0
-	local pending_refresh = false
+	end	-- do
 
-	updater = CreateFrame("Frame", nil, UIParent)
-	updater:Hide()
+	do
+		local last_update = 0
 
-	-- Handles tooltip hiding and the dynamic refresh of data
-	updater:SetScript("OnUpdate",
-			  function(self, elapsed)
-				  check_update = check_update + elapsed
+		function Spamalyzer:UpdateTooltip()
+			last_update = last_update + 1
 
-				  if check_update < 0.1 then
-					  return
-				  end
+			if not tooltip then
+				last_update = 0
+				self:CancelAllTimers()
+				return
+			end
 
-				  if tooltip:IsMouseOver() or (LDB_anchor and LDB_anchor:IsMouseOver()) then
-					  if pending_refresh then
-						  last_update = last_update + check_update
+			if tooltip:IsMouseOver() or (LDB_anchor and LDB_anchor:IsMouseOver()) then
+				if last_update < 5 then
+					SetElapsedLine(last_update <= 3)
+				else
+					last_update = 0
+				end
+			else
+				local elapsed = last_update * 0.2
 
-						  if last_update >= 0.13 then
-							  DrawTooltip(LDB_anchor)
-							  pending_refresh = false
-							  last_update = 0
-						  end
-					  else
-						  SetElapsedLine()
-						  last_update = 0
-					  end
-				  else
-					  last_update = last_update + check_update
+				if elapsed >= db.tooltip.timer then
+					self:CancelAllTimers()
 
-					  if last_update >= db.tooltip.timer then
-						  tooltip = LQT:Release(tooltip)
-						  LDB_anchor = nil
-						  elapsed_line = nil
-						  self:Hide()
-					  end
-				  end
-				  check_update = 0
-			  end)
+					tooltip = LQT:Release(tooltip)
+					LDB_anchor = nil
+					elapsed_line = nil
+					last_update = 0
+				end
+			end
+		end
+	end	-- do
 
 	local function NameOnMouseUp(cell, index)
 		local player = players[sorted_data[index]]
 		player.toggled = not player.toggled
-		DrawTooltip(LDB_anchor, true)
+		DrawTooltip(LDB_anchor)
 	end
 
 	local function SortOnMouseUp(cell, sort_func)
 		db.tooltip.sorting = sort_func
 		db.tooltip.sort_ascending = not db.tooltip.sort_ascending
 
-		DrawTooltip(LDB_anchor, true)
+		DrawTooltip(LDB_anchor)
 	end
 
-	function DrawTooltip(anchor, refresh)
+	local SORT_FUNCS = {
+		[1]	= function(a, b)	-- Name
+				  local player_a, player_b = players[a], players[b]
+
+				  if db.tooltip.sort_ascending then
+					  return player_a.name < player_b.name
+				  end
+				  return player_a.name > player_b.name
+			  end,
+
+		[2]	= function(a, b)	-- Bytes
+				  local player_a, player_b = players[a], players[b]
+
+				  if player_a.output == player_b.output then
+					  if db.tooltip.sort_ascending then
+						  return player_a.name < player_b.name
+					  end
+					  return player_a.name > player_b.name
+				  end
+
+				  if db.tooltip.sort_ascending then
+					  return player_a.output < player_b.output
+				  end
+				  return player_a.output > player_b.output
+			  end,
+
+		[3]	= function(a, b)	-- Messages
+				  local player_a, player_b = players[a], players[b]
+
+				  if player_a.messages == player_b.messages then
+					  if db.tooltip.sort_ascending then
+						  return player_a.name < player_b.name
+					  end
+					  return player_a.name > player_b.name
+				  end
+
+				  if db.tooltip.sort_ascending then
+					  return player_a.messages < player_b.messages
+				  end
+				  return player_a.messages > player_b.messages
+			  end
+	}
+
+	function DrawTooltip(anchor)
+		if not anchor then
+			return
+		end
 		LDB_anchor = anchor
 
 		if not tooltip then
@@ -294,9 +285,6 @@ do
 				-- Pass true as second parameter because hooking OnHide causes C stack overflows
 				TipTac:AddModifiedTip(tooltip, true)
 			end
-		elseif refresh and not pending_refresh then
-			pending_refresh = true
-			return
 		end
 
 		tooltip:Clear()
@@ -319,7 +307,6 @@ do
 			SetElapsedLine()
 
 			tooltip:Show()
-			updater:Show()
 			return
 		end
 		line = tooltip:AddLine(" ", " ", L["Messages"], L["Bytes"])
@@ -383,7 +370,6 @@ do
 		end
 		tooltip:UpdateScrolling()
 		tooltip:Show()
-		updater:Show()
 	end
 end	-- do
 
@@ -519,7 +505,7 @@ local function StoreMessage(prefix, message, type, origin, target)
 	UpdateDataFeed()
 
 	if LDB_anchor and tooltip and tooltip:IsVisible() then
-		DrawTooltip(LDB_anchor, true)
+		Spamalyzer:ScheduleTimer(DrawTooltip, 0.3, LDB_anchor)
 	end
 end
 
@@ -552,6 +538,7 @@ function Spamalyzer:OnEnable()
 		icon	= "Interface\\Icons\\INV_Letter_16",
 		OnEnter	= function(display, motion)
 				  DrawTooltip(display)
+				  Spamalyzer.tooltip_updater = Spamalyzer:ScheduleRepeatingTimer("UpdateTooltip", 0.2)
 			  end,
 		OnLeave	= function()
 			  end,
@@ -782,14 +769,14 @@ local function GetOptions()
 							width	= "full",
 							name	= L["Timer"],
 							desc	= L["Move the slider to adjust the tooltip fade time."],
-							min	= 0.1,
+							min	= 0.2,
 							max	= 2,
-							step	= 0.01,
+							step	= 0.1,
 							get	= function()
 									  return db.tooltip.timer
 								  end,
 							set	= function(info, value)
-									  db.tooltip.timer = math.max(0.1, math.min(2, value))
+									  db.tooltip.timer = math.max(0.2, math.min(2, value))
 								  end,
 						},
 						hide_hint = {
