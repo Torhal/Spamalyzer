@@ -399,6 +399,15 @@ local function EscapeChar(c)
 	return ("\\%03d"):format(c:byte())
 end
 
+-- Fired 0.5 seconds after a call to StoreMessage()
+function Spamalyzer:OnMessageUpdate()
+	UpdateDataFeed()
+
+	if LDB_anchor and tooltip and tooltip:IsVisible() then
+		DrawTooltip(LDB_anchor)
+	end
+end
+
 local function StoreMessage(prefix, message, type, origin, target)
 	local addon_name
 
@@ -502,10 +511,8 @@ local function StoreMessage(prefix, message, type, origin, target)
 	activity.bytes = activity.bytes + bytes
 	activity.messages = activity.messages + 1
 
-	UpdateDataFeed()
-
-	if LDB_anchor and tooltip and tooltip:IsVisible() then
-		Spamalyzer:ScheduleTimer(DrawTooltip, 0.3, LDB_anchor)
+	if not Spamalyzer.message_updater then
+		Spamalyzer.message_updater = Spamalyzer:ScheduleTimer("OnMessageUpdate", 0.5)
 	end
 end
 
