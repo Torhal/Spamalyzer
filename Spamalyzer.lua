@@ -399,6 +399,7 @@ function Spamalyzer:OnMessageUpdate()
 	if LDB_anchor and tooltip and tooltip:IsVisible() then
 		DrawTooltip(LDB_anchor)
 	end
+	self.message_updater = nil
 end
 
 local function StoreMessage(prefix, message, type, origin, target)
