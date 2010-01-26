@@ -30,7 +30,7 @@ local L			= LibStub("AceLocale-3.0"):GetLocale(ADDON_NAME)
 -- Variables.
 -------------------------------------------------------------------------------
 local players = {}		-- List of players and their data.
-local sorted_data = {}
+local sorted_players = {}
 
 -- Messages/bytes in/out
 local activity = {
@@ -217,7 +217,7 @@ do
 	end	-- do
 
 	local function NameOnMouseUp(cell, index)
-		local player = players[sorted_data[index]]
+		local player = players[sorted_players[index]]
 		player.toggled = not player.toggled
 		DrawTooltip(LDB_anchor)
 	end
@@ -296,7 +296,7 @@ do
 		tooltip:SetCell(line, 1, ADDON_NAME, "CENTER", NUM_COLUMNS)
 		tooltip:AddSeparator()
 
-		if #sorted_data == 0 then
+		if #sorted_players == 0 then
 			line = tooltip:AddLine()
 			tooltip:SetCell(line, 1, _G.EMPTY, "CENTER", NUM_COLUMNS)
 			tooltip:AddLine(" ")
@@ -319,11 +319,11 @@ do
 		local ICON_PLUS		= [[|TInterface\BUTTONS\UI-PlusButton-Up:20:20|t]]
 		local ICON_MINUS	= [[|TInterface\BUTTONS\UI-MinusButton-Up:20:20|t]]
 
-		if #sorted_data > 1 then
-			table.sort(sorted_data, SORT_FUNCS[db.tooltip.sorting])
+		if #sorted_players > 1 then
+			table.sort(sorted_players, SORT_FUNCS[db.tooltip.sorting])
 		end
 
-		for index, entry in ipairs(sorted_data) do
+		for index, entry in ipairs(sorted_players) do
 			local player = players[entry]
 			local toggled = player.toggled
 
@@ -472,7 +472,7 @@ local function StoreMessage(prefix, message, type, origin, target)
 			}
 		}
 		players[player_name] = player
-		table.insert(sorted_data, player_name)
+		table.insert(sorted_players, player_name)
 	else
 		player.messages = player.messages + 1
 		player.output = player.output + bytes
@@ -553,7 +553,7 @@ function Spamalyzer:OnEnable()
 					  end
 				  elseif button == "LeftButton" then
 					  if IsShiftKeyDown() then
-						  table.wipe(sorted_data)
+						  table.wipe(sorted_players)
 						  table.wipe(players)
 
 						  activity.output = 0
