@@ -383,6 +383,9 @@ end
 function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 	local tracking = track_cache[type]
 
+	if not tracking and not output_frame then
+		return
+	end
 	local addon_name
 
 	if KNOWN_PREFIXES[prefix] then
