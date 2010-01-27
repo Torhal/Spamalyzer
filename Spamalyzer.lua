@@ -388,7 +388,8 @@ do
 
 				if toggled then
 					for player_name, data in pairs(addon.players) do
-						player = players[player_name]
+						local player = players[player_name]
+
 						line = tooltip:AddLine(" ", " ", player.sources[addon_name].messages, player.sources[addon_name].output)
 						tooltip:SetCell(line, 2, string.format("|cff%s%s|r", CLASS_COLORS[player.class] or "cccccc", player.name), "LEFT")
 					end
