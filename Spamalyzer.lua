@@ -198,8 +198,13 @@ do
 	end	-- do
 
 	local function NameOnMouseUp(cell, index)
-		local player = players[sorted_players[index]]
-		player.toggled = not player.toggled
+		if db.tooltip.player_view then
+			local player = players[sorted_players[index]]
+			player.toggled = not player.toggled
+		else
+			local addon = addons[sorted_addons[index]]
+			addon.toggled = not addon.toggled
+		end
 		DrawTooltip(LDB_anchor)
 	end
 
@@ -210,7 +215,50 @@ do
 		DrawTooltip(LDB_anchor)
 	end
 
-	local SORT_FUNCS = {
+	local ADDON_SORT_FUNCS = {
+		[1]	= function(a, b)	-- Name
+				  local addon_a, addon_b = addons[a], addons[b]
+
+				  if db.tooltip.sort_ascending then
+					  return addon_a.name < addon_b.name
+				  end
+				  return addon_a.name > addon_b.name
+			  end,
+
+		[2]	= function(a, b)	-- Bytes
+				  local addon_a, addon_b = addons[a], addons[b]
+
+				  if addon_a.output == addon_b.output then
+					  if db.tooltip.sort_ascending then
+						  return addon_a.name < addon_b.name
+					  end
+					  return addon_a.name > addon_b.name
+				  end
+
+				  if db.tooltip.sort_ascending then
+					  return addon_a.output < addon_b.output
+				  end
+				  return addon_a.output > addon_b.output
+			  end,
+
+		[3]	= function(a, b)	-- Messages
+				  local addon_a, addon_b = addons[a], addons[b]
+
+				  if addon_a.messages == addon_b.messages then
+					  if db.tooltip.sort_ascending then
+						  return addon_a.name < addon_b.name
+					  end
+					  return addon_a.name > addon_b.name
+				  end
+
+				  if db.tooltip.sort_ascending then
+					  return addon_a.messages < addon_b.messages
+				  end
+				  return addon_a.messages > addon_b.messages
+			  end
+	}
+
+	local PLAYER_SORT_FUNCS = {
 		[1]	= function(a, b)	-- Name
 				  local player_a, player_b = players[a], players[b]
 
@@ -277,7 +325,11 @@ do
 		tooltip:SetCell(line, 1, ADDON_NAME, "CENTER", NUM_COLUMNS)
 		tooltip:AddSeparator()
 
-		if #sorted_players == 0 then
+		local player_view = db.tooltip.player_view
+		local sort_table = player_view and sorted_players or sorted_addons
+		local sort_funcs = player_view and PLAYER_SORT_FUNCS or ADDON_SORT_FUNCS
+
+		if #sort_table == 0 then
 			line = tooltip:AddLine()
 			tooltip:SetCell(line, 1, _G.EMPTY, "CENTER", NUM_COLUMNS)
 			tooltip:AddLine(" ")
@@ -300,25 +352,46 @@ do
 		local ICON_PLUS		= [[|TInterface\BUTTONS\UI-PlusButton-Up:20:20|t]]
 		local ICON_MINUS	= [[|TInterface\BUTTONS\UI-MinusButton-Up:20:20|t]]
 
-		if #sorted_players > 1 then
-			table.sort(sorted_players, SORT_FUNCS[db.tooltip.sorting])
+		if #sort_table > 1 then
+			table.sort(sort_table, sort_funcs[db.tooltip.sorting])
 		end
 
-		for index, entry in ipairs(sorted_players) do
-			local player = players[entry]
-			local toggled = player.toggled
+		if player_view then
+			for index, entry in ipairs(sorted_players) do
+				local player = players[entry]
+				local toggled = player.toggled
 
-			line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", player.messages, player.output)
-			tooltip:SetCell(line, 2, string.format("|cff%s%s|r", CLASS_COLORS[player.class] or "cccccc", player.name), "LEFT")
+				line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", player.messages, player.output)
+				tooltip:SetCell(line, 2, string.format("|cff%s%s|r", CLASS_COLORS[player.class] or "cccccc", player.name), "LEFT")
 
-			tooltip:SetLineScript(line, "OnMouseUp", NameOnMouseUp, index)
+				tooltip:SetLineScript(line, "OnMouseUp", NameOnMouseUp, index)
 
-			if toggled then
-				for addon, data in pairs(player.sources) do
-					local color = data.known and COLOR_GREEN or COLOR_RED
+				if toggled then
+					for addon, data in pairs(player.sources) do
+						local color = data.known and COLOR_GREEN or COLOR_RED
 
-					line = tooltip:AddLine(" ", " ", data.messages, data.output)
-					tooltip:SetCell(line, 2, string.format("%s%s|r", color, addon), "LEFT")
+						line = tooltip:AddLine(" ", " ", data.messages, data.output)
+						tooltip:SetCell(line, 2, string.format("%s%s|r", color, addon), "LEFT")
+					end
+				end
+			end
+		else
+			for index, addon_name in ipairs(sorted_addons) do
+				local addon = addons[addon_name]
+				local toggled = addon.toggled
+				local color = addon.known and COLOR_GREEN or COLOR_RED
+
+				line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", addon.messages, addon.output)
+				tooltip:SetCell(line, 2, string.format("%s%s|r", color, addon_name), "LEFT")
+
+				tooltip:SetLineScript(line, "OnMouseUp", NameOnMouseUp, index)
+
+				if toggled then
+					for player_name, data in pairs(addon.players) do
+						player = players[player_name]
+						line = tooltip:AddLine(" ", " ", player.sources[addon_name].messages, player.sources[addon_name].output)
+						tooltip:SetCell(line, 2, string.format("|cff%s%s|r", CLASS_COLORS[player.class] or "cccccc", player.name), "LEFT")
+					end
 				end
 			end
 		end
@@ -349,6 +422,9 @@ do
 
 			line = tooltip:AddLine()
 			tooltip:SetCell(line, 1, L["Right-click for options."], "LEFT", NUM_COLUMNS)
+
+			line = tooltip:AddLine()
+			tooltip:SetCell(line, 1, L["Middle-click to change tooltip mode."], "LEFT", NUM_COLUMNS)
 		end
 		tooltip:UpdateScrolling()
 		tooltip:Show()
@@ -481,6 +557,26 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 		player.output = player.output + bytes
 	end
 
+	local addon = addons[addon_name]
+
+	if not addon then
+		addon = {
+			["messages"]	= 1,
+			["output"]	= bytes,
+			["known"]	= known,
+			["name"]	= addon_name,
+			["players"]	= {
+				[player_name] = true
+			}
+		}
+		addons[addon_name] = addon
+		table.insert(sorted_addons, addon_name)
+	else
+		addon.players[player_name] = true
+		addon.output = addon.output + bytes
+		addon.messages = addon.messages + 1
+	end
+
 	if origin == MY_NAME then
 		activity.output = activity.output + bytes
 		activity.sent = activity.sent + 1
@@ -532,6 +628,7 @@ function Spamalyzer:OnInitialize()
 			},
 			tooltip = {
 				hide_hint	= false,
+				player_view	= true,
 				show_stats	= false,
 				scale		= 1,
 				sorting		= 1,	-- Name.
@@ -606,6 +703,10 @@ function Spamalyzer:OnEnable()
 						  db.datafeed.display = cur_val
 						  UpdateDataFeed()
 					  end
+				  elseif button == "MiddleButton" then
+					  db.tooltip.player_view = not db.tooltip.player_view
+					  elapsed_line = nil
+					  DrawTooltip(display)
 				  end
 			  end,
 	})

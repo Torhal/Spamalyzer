@@ -28,6 +28,7 @@ L["Input"]							= true
 L["Left-click to change datafeed type."]			= true
 
 L["Messages"]							= true
+L["Middle-click to change tooltip mode."]			= true
 L["Minimap Icon"]						= true
 L["Move the slider to adjust the scale of the tooltip."]	= true
 L["Move the slider to adjust the tooltip fade time."]		= true
