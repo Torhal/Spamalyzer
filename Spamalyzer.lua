@@ -381,9 +381,9 @@ function Spamalyzer:OnMessageUpdate()
 	timers.message_update = nil
 end
 
+function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 	local tracking = track_cache[type]
 
-local function StoreMessage(prefix, message, type, origin, target)
 	local addon_name
 
 	if KNOWN_PREFIXES[prefix] then
@@ -495,7 +495,7 @@ end
 -------------------------------------------------------------------------------
 function Spamalyzer:SendAddonMessage(prefix, message, type, target)
 	if target and target ~= "" and type == "WHISPER" then
-		StoreMessage(prefix, message, type, MY_NAME, target)
+		self:StoreMessage(prefix, message, type, MY_NAME, target)
 	end
 end
 
@@ -626,7 +626,7 @@ end
 
 
 function Spamalyzer:CHAT_MSG_ADDON(event, prefix, message, channel, sender)
-	StoreMessage(prefix, message, channel, sender)
+	self:StoreMessage(prefix, message, channel, sender)
 end
 
 -------------------------------------------------------------------------------
