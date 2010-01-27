@@ -127,7 +127,6 @@ end
 do
 	local NUM_COLUMNS = 4
 
-	local SetElapsedLine
 	do
 		local function TimeStr(val)
 			local tm = tonumber(val)
@@ -146,8 +145,8 @@ do
 		end
 		local time_str = TimeStr(GetTime() - epoch)	-- Cached value used between updates.
 
-		function SetElapsedLine(use_cache)
-			if not elapsed_line then
+		function Spamalyzer:UpdateElapsed(use_cache)
+			if not elapsed_line or not tooltip then
 				return
 			end
 
@@ -156,7 +155,6 @@ do
 				return
 			end
 			time_str = TimeStr(GetTime() - epoch)
-
 			tooltip:SetCell(elapsed_line, NUM_COLUMNS, time_str)
 		end
 	end	-- do
@@ -168,23 +166,23 @@ do
 			last_update = last_update + 1
 
 			if not tooltip then
+				self:CancelTimer(timers.elapsed_update)
+				timers.elapsed_update = nil
 				last_update = 0
 				self:CancelAllTimers()
 				return
 			end
 
 			if tooltip:IsMouseOver() or (LDB_anchor and LDB_anchor:IsMouseOver()) then
-				if last_update < 5 then
-					SetElapsedLine(last_update <= 3)
-				else
-					last_update = 0
-				end
+				last_update = 0
 			else
 				local elapsed = last_update * 0.2
 
 				if elapsed >= db.tooltip.timer then
+					self:CancelTimer(timers.elapsed_update)
 					self:CancelAllTimers()
 
+					timers.elapsed_update = nil
 					tooltip = LQT:Release(tooltip)
 					LDB_anchor = nil
 					elapsed_line = nil
@@ -282,8 +280,8 @@ do
 			elapsed_line = tooltip:AddLine()
 			tooltip:SetCell(elapsed_line, 1, _G.TIME_ELAPSED, "LEFT", 3)
 
-			SetElapsedLine()
-
+			Spamalyzer:UpdateElapsed(timers.elapsed_update)
+			
 			tooltip:Show()
 			return
 		end
@@ -323,7 +321,8 @@ do
 
 		elapsed_line = tooltip:AddLine()
 		tooltip:SetCell(elapsed_line, 1, _G.TIME_ELAPSED, "LEFT", 3)
-		SetElapsedLine()
+
+		Spamalyzer:UpdateElapsed(timers.elapsed_update)
 
 		if db.tooltip.show_stats then
 			tooltip:AddSeparator()
@@ -548,6 +547,9 @@ function Spamalyzer:OnEnable()
 		text	= " ",
 		icon	= "Interface\\Icons\\INV_Letter_16",
 		OnEnter	= function(display, motion)
+				  if not timers.elapsed_update then
+					  timers.elapsed_update = self:ScheduleRepeatingTimer("UpdateElapsed", 1)
+				  end
 				  DrawTooltip(display)
 				  Spamalyzer.tooltip_updater = Spamalyzer:ScheduleRepeatingTimer("UpdateTooltip", 0.2)
 			  end,
