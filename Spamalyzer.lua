@@ -548,11 +548,14 @@ function Spamalyzer:OnEnable()
 		text	= " ",
 		icon	= "Interface\\Icons\\INV_Letter_16",
 		OnEnter	= function(display, motion)
+				  if not timers.tooltip_update then
+					  DrawTooltip(display)
+					  timers.tooltip_update = self:ScheduleRepeatingTimer("UpdateTooltip", 0.2)
+				  end
+
 				  if not timers.elapsed_update then
 					  timers.elapsed_update = self:ScheduleRepeatingTimer("UpdateElapsed", 1)
 				  end
-				  DrawTooltip(display)
-				  Spamalyzer.tooltip_updater = Spamalyzer:ScheduleRepeatingTimer("UpdateTooltip", 0.2)
 			  end,
 		OnLeave	= function()
 			  end,
