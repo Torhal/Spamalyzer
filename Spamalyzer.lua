@@ -37,6 +37,8 @@ local sorted_addons	= {}
 
 local guild_classes	= {}	-- Guild cache, updated when GUILD_ROSTER_UPDATE fires.
 
+local timers		= {}	-- Timers currently in use
+
 -- Messages/bytes in/out
 local activity = {
 	["output"]	= 0,
@@ -367,14 +369,14 @@ local function EscapeChar(c)
 	return ("\\%03d"):format(c:byte())
 end
 
--- Fired 0.5 seconds after a call to StoreMessage()
+-- Fired 1.5 seconds after a call to StoreMessage()
 function Spamalyzer:OnMessageUpdate()
 	UpdateDataFeed()
 
 	if LDB_anchor and tooltip and tooltip:IsVisible() then
 		DrawTooltip(LDB_anchor)
 	end
-	self.message_updater = nil
+	timers.message_update = nil
 end
 
 local function StoreMessage(prefix, message, type, origin, target)
@@ -480,8 +482,8 @@ local function StoreMessage(prefix, message, type, origin, target)
 	activity.bytes = activity.bytes + bytes
 	activity.messages = activity.messages + 1
 
-	if not Spamalyzer.message_updater then
-		Spamalyzer.message_updater = Spamalyzer:ScheduleTimer("OnMessageUpdate", 0.5)
+	if not timers.message_update then
+		timers.message_update = self:ScheduleTimer("OnMessageUpdate", 1.5)
 	end
 end
 
