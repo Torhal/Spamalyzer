@@ -53,7 +53,7 @@ local activity = {
 
 local db
 local output_frame	-- ChatFrame to direct AddonMessages to.
-local epoch = GetTime()
+local epoch		= GetTime()	-- Beginning time for AddonMessage tracking.
 
 -------------------------------------------------------------------------------
 -- Constants.
@@ -493,6 +493,7 @@ end
 -- Hooked functions.
 -------------------------------------------------------------------------------
 function Spamalyzer:SendAddonMessage(prefix, message, type, target)
+	-- Only gather messages we send to the whiper channel, because we'll catch everything else.
 	if target and target ~= "" and type == "WHISPER" then
 		self:StoreMessage(prefix, message, type, MY_NAME, target)
 	end
