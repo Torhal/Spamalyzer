@@ -594,14 +594,14 @@ function Spamalyzer:OnEnable()
 	})
 	UpdateDataFeed()
 
+	self:RegisterEvent("CHAT_MSG_ADDON")
+	self:RegisterEvent("GUILD_ROSTER_UPDATE")
+	self:SecureHook("SendAddonMessage")
+
 	-------------------------------------------------------------------------------
 	-- Cache guild information for later use.
 	-------------------------------------------------------------------------------
-	self:UpdateGuildInfo()
-
-	self:RegisterEvent("CHAT_MSG_ADDON")
-	self:RegisterEvent("GUILD_ROSTER_UPDATE", self.UpdateGuildInfo)
-	self:SecureHook("SendAddonMessage")
+	self:GUILD_ROSTER_UPDATE()
 
 	if LDBIcon then
 		LDBIcon:Register(ADDON_NAME, data_obj, db.datafeed.minimap_icon)
@@ -609,15 +609,19 @@ function Spamalyzer:OnEnable()
 end
 
 function Spamalyzer:OnDisable()
+	for k, v in pairs(timers) do
+		self:CancelTimer(v, true)
+		timers[k] = nil
+	end
 end
 
-function Spamalyzer:UpdateGuildInfo()
+function Spamalyzer:GUILD_ROSTER_UPDATE()
 	if not IsInGuild() then
 		return
 	end
 	table.wipe(guild_classes)
 
-	for count = 1, GetNumGuildMembers(false), 1 do
+	for count = 1, GetNumGuildMembers(true), 1 do
 		local name, _, _, _, _, _, _, _, _, _, class = GetGuildRosterInfo(count)
 
 		guild_classes[name] = class
