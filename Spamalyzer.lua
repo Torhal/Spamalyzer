@@ -39,6 +39,8 @@ local guild_classes	= {}	-- Guild cache, updated when GUILD_ROSTER_UPDATE fires.
 
 local timers		= {}	-- Timers currently in use
 
+local track_cache	= {}	-- Cached tracking types to avoid constant string.lower() calls.
+
 -- Messages/bytes in/out
 local activity = {
 	["output"]	= 0,
@@ -379,6 +381,8 @@ function Spamalyzer:OnMessageUpdate()
 	timers.message_update = nil
 end
 
+	local tracking = track_cache[type]
+
 local function StoreMessage(prefix, message, type, origin, target)
 	local addon_name
 
@@ -405,7 +409,6 @@ local function StoreMessage(prefix, message, type, origin, target)
 		KNOWN_PREFIXES[prefix] = addon_name
 	end
 	local known = addon_name and true or false	-- If addon_name is nil, we didn't find a match.
-	local tracking = db.tracking[type:lower()]
 
 	if output_frame and ((known and db.general.display_known) or (not known and db.general.display_unknown)) then
 		local color = tracking and COLOR_PALE_GREEN or COLOR_PINK
@@ -532,6 +535,9 @@ function Spamalyzer:OnInitialize()
 
 	output_frame = CHAT_FRAME_MAP[db.general.display_frame]
 
+	for track_type, val in pairs(db.tracking) do
+		track_cache[track_type:upper()] = val
+	end
 	self:SetupOptions()
 end
 
@@ -728,7 +734,10 @@ local function GetOptions()
 							name	= _G.BATTLEGROUND,
 							desc	= string.format(L["Toggle recording of %s AddOn messages."], _G.BATTLEGROUND),
 							get	= function() return db.tracking.battleground end,
-							set	= function() db.tracking.battleground = not db.tracking.battleground end,
+							set	= function()
+									  db.tracking.battleground = not db.tracking.battleground
+									  track_cache["BATTLEGROUND"] = db.tracking.battleground
+								  end,
 						},
 						guild = {
 							order	= 20,
@@ -736,7 +745,10 @@ local function GetOptions()
 							name	= _G.GUILD,
 							desc	= string.format(L["Toggle recording of %s AddOn messages."], _G.GUILD),
 							get	= function() return db.tracking.guild end,
-							set	= function() db.tracking.guild = not db.tracking.guild end,
+							set	= function()
+									  db.tracking.guild = not db.tracking.guild
+									  track_cache["GUILD"] = db.tracking.guild
+								  end,
 						},
 						party = {
 							order	= 30,
@@ -744,7 +756,10 @@ local function GetOptions()
 							name	= _G.PARTY,
 							desc	= string.format(L["Toggle recording of %s AddOn messages."], _G.PARTY),
 							get	= function() return db.tracking.party end,
-							set	= function() db.tracking.party = not db.tracking.party end,
+							set	= function()
+									  db.tracking.party = not db.tracking.party
+									  track_cache["PARTY"] = db.tracking.party
+								  end,
 						},
 						raid = {
 							order	= 40,
@@ -752,7 +767,10 @@ local function GetOptions()
 							name	= _G.RAID,
 							desc	= string.format(L["Toggle recording of %s AddOn messages."], _G.RAID),
 							get	= function() return db.tracking.raid end,
-							set	= function() db.tracking.raid = not db.tracking.raid end,
+							set	= function()
+									  db.tracking.raid = not db.tracking.raid
+									  track_cache["RAID"] = db.tracking.raid
+								  end,
 						},
 						whisper	= {
 							order	= 50,
@@ -760,7 +778,10 @@ local function GetOptions()
 							name	= _G.WHISPER,
 							desc	= string.format(L["Toggle recording of %s AddOn messages."], _G.WHISPER),
 							get	= function() return db.tracking.whisper end,
-							set	= function() db.tracking.whisper = not db.tracking.whisper end,
+							set	= function()
+									  db.tracking.whisper = not db.tracking.whisper
+									  track_cache["WHISPER"] = db.tracking.whisper
+								  end,
 						},
 					},
 				},
