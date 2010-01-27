@@ -456,10 +456,6 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 		players[player_name] = player
 		table.insert(sorted_players, player_name)
 	else
-		player.messages = player.messages + 1
-		player.output = player.output + bytes
-		player.class = player.class or GetPlayerClass(origin)
-
 		local source = player.sources[addon_name]
 
 		if not source then
@@ -472,6 +468,9 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 		end
 		source.output = source.output + bytes
 		source.messages = source.messages + 1
+
+		player.messages = player.messages + 1
+		player.output = player.output + bytes
 	end
 
 	if origin == MY_NAME then
@@ -530,6 +529,10 @@ function Spamalyzer:OnInitialize()
 				sorting		= 1,	-- Name.
 				sort_ascending	= true,
 				timer		= 0.25,
+			},
+		}
+	}
+
 	local temp_db = LibStub("AceDB-3.0"):New(ADDON_NAME.."DB", defaults)
 	db = temp_db.global
 
