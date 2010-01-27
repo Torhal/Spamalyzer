@@ -35,7 +35,7 @@ local sorted_players	= {}
 local addons		= {}	-- List of AddOns and their data.
 local sorted_addons	= {}
 
-local guild_members	= {}	-- Guild cache, updated when GUILD_ROSTER_UPDATE fires.
+local guild_classes	= {}	-- Guild cache, updated when GUILD_ROSTER_UPDATE fires.
 
 -- Messages/bytes in/out
 local activity = {
@@ -351,14 +351,16 @@ end	-- do
 -- Helper functions.
 -------------------------------------------------------------------------------
 local function GetPlayerClass(player)
+	local guildie = guild_classes[player]
+
+	if guildie then
+		return guildie
+	end
 	local _, class_english = UnitClass(player)
 
 	if class_english then
 		return class_english
 	end
-
-	-- Last chance - check Guild.
-	return guild_members[player]
 end
 
 local function EscapeChar(c)
@@ -605,12 +607,12 @@ function Spamalyzer:UpdateGuildInfo()
 	if not IsInGuild() then
 		return
 	end
-	table.wipe(guild_members)
+	table.wipe(guild_classes)
 
 	for count = 1, GetNumGuildMembers(false), 1 do
 		local name, _, _, _, _, _, _, _, _, _, class = GetGuildRosterInfo(count)
 
-		guild_members[name] = class
+		guild_classes[name] = class
 	end
 end
 
