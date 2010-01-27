@@ -166,10 +166,14 @@ do
 			last_update = last_update + 1
 
 			if not tooltip then
+				self:CancelTimer(timers.tooltip_update)
 				self:CancelTimer(timers.elapsed_update)
+
+				timers.tooltip_update = nil
 				timers.elapsed_update = nil
+				LDB_anchor = nil
+				elapsed_line = nil
 				last_update = 0
-				self:CancelAllTimers()
 				return
 			end
 
@@ -179,9 +183,10 @@ do
 				local elapsed = last_update * 0.2
 
 				if elapsed >= db.tooltip.timer then
+					self:CancelTimer(timers.tooltip_update)
 					self:CancelTimer(timers.elapsed_update)
-					self:CancelAllTimers()
 
+					timers.tooltip_update = nil
 					timers.elapsed_update = nil
 					tooltip = LQT:Release(tooltip)
 					LDB_anchor = nil
