@@ -54,37 +54,6 @@ local epoch = GetTime()
 -------------------------------------------------------------------------------
 -- Constants.
 -------------------------------------------------------------------------------
-local defaults = {
-	global = {
-		datafeed = {
-			display		= 1,	-- Output (in bytes)
-			minimap_icon	= {
-				hide	= false,
-			},
-		},
-		general = {
-			display_frame	= 1,	-- None.
-			display_known	= true,
-			display_unknown	= true,
-		},
-		tracking = {
-			battleground	= false,
-			guild		= false,
-			party		= true,
-			raid		= true,
-			whisper		= true,
-		},
-		tooltip = {
-			hide_hint	= false,
-			show_stats	= false,
-			scale		= 1,
-			sorting		= 1,	-- Name.
-			sort_ascending	= true,
-			timer		= 0.25,
-		},
-	}
-}
-
 local SORT_VALUES = {
 	[1]	= _G.NAME,
 	[2]	= L["Bytes"],
@@ -527,6 +496,33 @@ end
 -- Event functions.
 -------------------------------------------------------------------------------
 function Spamalyzer:OnInitialize()
+	local defaults = {
+		global = {
+			datafeed = {
+				display		= 1,	-- Output (in bytes)
+				minimap_icon	= {
+					hide	= false,
+				},
+			},
+			general = {
+				display_frame	= 1,	-- None.
+				display_known	= true,
+				display_unknown	= true,
+			},
+			tracking = {
+				battleground	= false,
+				guild		= false,
+				party		= true,
+				raid		= true,
+				whisper		= true,
+			},
+			tooltip = {
+				hide_hint	= false,
+				show_stats	= false,
+				scale		= 1,
+				sorting		= 1,	-- Name.
+				sort_ascending	= true,
+				timer		= 0.25,
 	local temp_db = LibStub("AceDB-3.0"):New(ADDON_NAME.."DB", defaults)
 	db = temp_db.global
 
