@@ -455,15 +455,15 @@ do
 				local toggled = addon.toggled
 				local color = addon.known and COLOR_GREEN or COLOR_RED
 
-				if #addon.sorted > 1 then
-					table.sort(addon.sorted, PLAYER_SORT_FUNCS[sort_method])
-				end
-
 				line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", addon.messages, addon.output)
 				tooltip:SetCell(line, 2, string.format("%s%s|r", color, addon_name), "LEFT")
 				tooltip:SetLineScript(line, "OnMouseUp", NameOnMouseUp, index)
 
 				if toggled then
+					if #addon.sorted > 1 then
+						table.sort(addon.sorted, PLAYER_SORT_FUNCS[sort_method])
+					end
+
 					for index, player_name in ipairs(addon.sorted) do
 						local player = players[player_name]
 
@@ -477,15 +477,15 @@ do
 				local channel = channels[channel_name]
 				local toggled = channel.toggled
 
-				if #channel.sorted > 1 then
-					table.sort(channel.sorted, ADDON_SORT_FUNCS[sort_method])
-				end
-
 				line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", channel.messages, channel.output)
 				tooltip:SetCell(line, 2, channel.name, "LEFT")
 				tooltip:SetLineScript(line, "OnMouseUp", NameOnMouseUp, index)
 
 				if toggled then
+					if #channel.sorted > 1 then
+						table.sort(channel.sorted, ADDON_SORT_FUNCS[sort_method])
+					end
+
 					for index, addon_name in ipairs(channel.sorted) do
 						local addon = channel.sources[addon_name]
 						local color = addon.known and COLOR_GREEN or COLOR_RED
@@ -500,15 +500,15 @@ do
 				local player = players[player_name]
 				local toggled = player.toggled
 
-				if #player.sorted > 1 then
-					table.sort(player.sorted, ADDON_SORT_FUNCS[sort_method])
-				end
-
 				line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", player.messages, player.output)
 				tooltip:SetCell(line, 2, string.format("|cff%s%s|r%s", CLASS_COLORS[player.class] or "cccccc", player_name, player.realm or ""), "LEFT")
 				tooltip:SetLineScript(line, "OnMouseUp", NameOnMouseUp, index)
 
 				if toggled then
+					if #player.sorted > 1 then
+						table.sort(player.sorted, ADDON_SORT_FUNCS[sort_method])
+					end
+
 					for index, addon_name in ipairs(player.sorted) do
 						local addon = player.sources[addon_name]
 						local color = addon.known and COLOR_GREEN or COLOR_RED
