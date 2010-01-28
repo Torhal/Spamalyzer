@@ -31,7 +31,8 @@ local LQT		= LibStub("LibQTip-1.0")
 local LDB		= LibStub("LibDataBroker-1.1")
 local LDBIcon		= LibStub("LibDBIcon-1.0")
 local L			= LibStub("AceLocale-3.0"):GetLocale(ADDON_NAME)
-local tekDebug		= tekDebug:GetFrame(ADDON_NAME)
+
+local debugger		= _G.tekDebug and _G.tekDebug:GetFrame(ADDON_NAME)
 
 -------------------------------------------------------------------------------
 -- Variables.
@@ -446,8 +447,10 @@ end	-- do
 -- Helper functions.
 -------------------------------------------------------------------------------
 local function Debug(...)
-	if tekDebug then
-		tekDebug:AddMessage(string.join(", ", ...))
+	if debugger then
+		debugger:AddMessage(string.join(", ", ...))
+	else
+		print("Gah")
 	end
 end
 
