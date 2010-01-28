@@ -134,6 +134,12 @@ end
 -- Populated in Spamalyzer:OnInitialize()
 local CHANNEL_COLORS = {}
 
+local function Debug(...)
+	if debugger then
+		debugger:AddMessage(string.join(", ", ...))
+	end
+end
+
 -------------------------------------------------------------------------------
 -- Tooltip and Databroker methods.
 -------------------------------------------------------------------------------
