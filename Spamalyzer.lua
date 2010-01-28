@@ -752,7 +752,7 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 		source.output = source.output + bytes
 		source.messages = source.messages + 1
 
-		channel.messages = player.messages + 1
+		channel.messages = channel.messages + 1
 		channel.output = channel.output + bytes
 	end
 
