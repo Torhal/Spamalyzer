@@ -69,12 +69,6 @@ local epoch		= GetTime()	-- Beginning time for AddonMessage tracking.
 -------------------------------------------------------------------------------
 -- Constants.
 -------------------------------------------------------------------------------
-local SORT_VALUES = {
-	[1]	= _G.NAME,
-	[2]	= L["Bytes"],
-	[3]	= L["Messages"],
-}
-
 local DISPLAY_NAMES = {
 	[1]	= L["Output"],
 	[2]	= L["Input"],
@@ -97,6 +91,12 @@ local VIEW_MODES = {
 	[1]	= _G.ADDONS,
 	[2]	= _G.CHANNEL,
 	[3]	= _G.PLAYER,
+}
+
+local SORT_VALUES = {
+	[1]	= _G.NAME,
+	[2]	= L["Bytes"],
+	[3]	= L["Messages"],
 }
 
 local SORT_TABLES = {
@@ -130,7 +130,6 @@ local COLOR_GREEN	= "|cff00ff00"
 local COLOR_PALE_GREEN	= "|cffa3feba"
 local COLOR_PINK	= "|cffffbbbb"
 local COLOR_RED		= "|cffff0000"
-local COLOR_YELLOW	= "|cffffff00"
 
 local COLOR_TABLE = CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS
 local CLASS_COLORS = {}
@@ -565,7 +564,7 @@ local function GetPlayerClass(player)
 	if guildie then
 		return guildie
 	end
-	local _, class_english = UnitClass(player)
+	local _, class_english = _G.UnitClass(player)
 
 	if class_english then
 		return class_english
@@ -926,13 +925,13 @@ function Spamalyzer:OnDisable()
 end
 
 function Spamalyzer:GUILD_ROSTER_UPDATE()
-	if not IsInGuild() then
+	if not _G.IsInGuild() then
 		return
 	end
 	table.wipe(guild_classes)
 
-	for count = 1, GetNumGuildMembers(true), 1 do
-		local name, _, _, _, _, _, _, _, _, _, class = GetGuildRosterInfo(count)
+	for count = 1, _G.GetNumGuildMembers(true), 1 do
+		local name, _, _, _, _, _, _, _, _, _, class = _G.GetGuildRosterInfo(count)
 
 		guild_classes[name] = class
 	end
