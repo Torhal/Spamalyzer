@@ -116,6 +116,14 @@ local CHAT_FRAME_MAP = {
 	[8]	= _G.ChatFrame7,
 }
 
+local CHANNEL_TYPE_NAMES = {
+	["BATTLEGROUND"]	= _G.BATTLEGROUND,
+	["GUILD"]		= _G.GUILD,
+	["PARTY"]		= _G.PARTY,
+	["RAID"]		= _G.RAID,
+	["WHISPER"]		= _G.WHISPER,
+}
+
 local MY_NAME		= UnitName("player")
 
 local COLOR_GREEN	= "|cff00ff00"
@@ -619,7 +627,7 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 		target = target and (" to "..target..", from ") or ""
 
 		output_frame:AddMessage(string.format("%s%s|r (|cff%s%s|r): %s[%s] [%s]|r %s %s[%s]|r",
-						      display_color, display_name, CHANNEL_COLORS[type], type, color, prefix, message, target, color, origin))
+						      display_color, display_name, CHANNEL_COLORS[type], CHANNEL_TYPE_NAMES[type], color, prefix, message, target, color, origin))
 	end
 
 	-- Not tracking data from this message type, so stop here.
@@ -722,7 +730,7 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 
 	if not channel then
 		channel = {
-			["name"]	= "|cff"..CHANNEL_COLORS[type]..type.."|r",
+			["name"]	= "|cff"..CHANNEL_COLORS[type]..CHANNEL_TYPE_NAMES[type].."|r",
 			["messages"]	= 1,
 			["output"]	= bytes,
 			["sorted"]	= {},
