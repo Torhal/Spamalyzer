@@ -115,6 +115,9 @@ for k, v in pairs(COLOR_TABLE) do
 	CLASS_COLORS[k] = string.format("%2x%2x%2x", v.r * 255, v.g * 255, v.b * 255)
 end
 
+-- Populated in Spamalyzer:OnInitialize()
+local CHANNEL_COLORS = {}
+
 -------------------------------------------------------------------------------
 -- Tooltip and Databroker methods.
 -------------------------------------------------------------------------------
@@ -738,6 +741,14 @@ function Spamalyzer:OnEnable()
 
 	if LDBIcon then
 		LDBIcon:Register(ADDON_NAME, data_obj, db.datafeed.minimap_icon)
+	end
+
+	-- Populate the color table.
+	for track_type, val in pairs(db.tracking) do
+		local upper_type = track_type:upper()
+		local chat_info = _G.ChatTypeInfo[upper_type]
+
+		CHANNEL_COLORS[upper_type] = string.format("%2x%2x%2x", chat_info.r * 255, chat_info.g * 255, chat_info.b * 255)
 	end
 end
 
