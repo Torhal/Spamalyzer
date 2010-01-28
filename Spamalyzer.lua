@@ -436,9 +436,10 @@ do
 
 		local ICON_PLUS		= [[|TInterface\BUTTONS\UI-PlusButton-Up:20:20|t]]
 		local ICON_MINUS	= [[|TInterface\BUTTONS\UI-MinusButton-Up:20:20|t]]
+		local sort_method	= db.tooltip.sorting
 
 		if #sort_table > 1 then
-			table.sort(sort_table, sort_funcs[db.tooltip.sorting])
+			table.sort(sort_table, sort_funcs[sort_method])
 		end
 
 		if view_mode == 1 then	-- AddOns view
@@ -447,12 +448,16 @@ do
 				local toggled = addon.toggled
 				local color = addon.known and COLOR_GREEN or COLOR_RED
 
+				if #addon.sorted > 1 then
+					table.sort(addon.sorted, PLAYER_SORT_FUNCS[sort_method])
+				end
+
 				line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", addon.messages, addon.output)
 				tooltip:SetCell(line, 2, string.format("%s%s|r", color, addon_name), "LEFT")
 				tooltip:SetLineScript(line, "OnMouseUp", NameOnMouseUp, index)
 
 				if toggled then
-					for player_name, data in pairs(addon.players) do
+					for index, player_name in ipairs(addon.sorted) do
 						local player = players[player_name]
 
 						line = tooltip:AddLine(" ", " ", player.sources[addon_name].messages, player.sources[addon_name].output)
@@ -465,16 +470,21 @@ do
 				local channel = channels[channel_name]
 				local toggled = channel.toggled
 
+				if #channel.sorted > 1 then
+					table.sort(channel.sorted, ADDON_SORT_FUNCS[sort_method])
+				end
+
 				line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", channel.messages, channel.output)
 				tooltip:SetCell(line, 2, channel.name, "LEFT")
 				tooltip:SetLineScript(line, "OnMouseUp", NameOnMouseUp, index)
 
 				if toggled then
-					for addon, data in pairs(channel.sources) do
-						local color = data.known and COLOR_GREEN or COLOR_RED
+					for index, addon_name in ipairs(channel.sorted) do
+						local addon = channel.sources[addon_name]
+						local color = addon.known and COLOR_GREEN or COLOR_RED
 
-						line = tooltip:AddLine(" ", " ", data.messages, data.output)
-						tooltip:SetCell(line, 2, string.format("%s%s|r", color, addon), "LEFT")
+						line = tooltip:AddLine(" ", " ", addon.messages, addon.output)
+						tooltip:SetCell(line, 2, string.format("%s%s|r", color, addon_name), "LEFT")
 					end
 				end
 			end
@@ -483,16 +493,21 @@ do
 				local player = players[player_name]
 				local toggled = player.toggled
 
+				if #player.sorted > 1 then
+					table.sort(player.sorted, ADDON_SORT_FUNCS[sort_method])
+				end
+
 				line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", player.messages, player.output)
 				tooltip:SetCell(line, 2, string.format("|cff%s%s|r%s", CLASS_COLORS[player.class] or "cccccc", player_name, player.realm or ""), "LEFT")
 				tooltip:SetLineScript(line, "OnMouseUp", NameOnMouseUp, index)
 
 				if toggled then
-					for addon, data in pairs(player.sources) do
-						local color = data.known and COLOR_GREEN or COLOR_RED
+					for index, addon_name in ipairs(player.sorted) do
+						local addon = player.sources[addon_name]
+						local color = addon.known and COLOR_GREEN or COLOR_RED
 
-						line = tooltip:AddLine(" ", " ", data.messages, data.output)
-						tooltip:SetCell(line, 2, string.format("%s%s|r", color, addon), "LEFT")
+						line = tooltip:AddLine(" ", " ", addon.messages, addon.output)
+						tooltip:SetCell(line, 2, string.format("%s%s|r", color, addon_name), "LEFT")
 					end
 				end
 			end
@@ -536,12 +551,6 @@ end	-- do
 -------------------------------------------------------------------------------
 -- Helper functions.
 -------------------------------------------------------------------------------
-local function Debug(...)
-	if debugger then
-		debugger:AddMessage(string.join(", ", ...))
-	end
-end
-
 local function GetPlayerClass(player)
 	local guildie = guild_classes[player]
 
@@ -637,6 +646,7 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 			["name"]	= player_name,
 			["messages"]	= 1,
 			["output"]	= bytes,
+			["sorted"]	= {},
 			["sources"]	= {
 				[addon_name] = {
 					["messages"]	= 1,
@@ -645,6 +655,8 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 				}
 			}
 		}
+		table.insert(player.sorted, addon_name)
+
 		if realm then
 			local color = CHANNEL_COLORS[type] or "cccccc"
 
@@ -673,6 +685,7 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 				["messages"]	= 0,
 				["output"]	= 0,
 			}
+			table.insert(player.sorted, addon_name)
 			player.sources[addon_name] = source
 		end
 		source.output = source.output + bytes
@@ -690,10 +703,13 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 			["output"]	= bytes,
 			["known"]	= known,
 			["name"]	= addon_name,
+			["sorted"]	= {},
 			["players"]	= {
 				[player_name] = true
 			}
 		}
+		table.insert(addon.sorted, player_name)
+
 		addons[addon_name] = addon
 		table.insert(sorted_addons, addon_name)
 	else
@@ -702,10 +718,6 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 		addon.messages = addon.messages + 1
 	end
 
-
-
-
-
 	local channel = channels[type]
 
 	if not channel then
@@ -713,6 +725,7 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 			["name"]	= "|cff"..CHANNEL_COLORS[type]..type.."|r",
 			["messages"]	= 1,
 			["output"]	= bytes,
+			["sorted"]	= {},
 			["sources"]	= {
 				[addon_name] = {
 					["messages"]	= 1,
@@ -721,6 +734,7 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 				}
 			}
 		}
+		table.insert(channel.sorted, addon_name)
 		channels[type] = channel
 		table.insert(sorted_channels, type)
 	else
@@ -732,6 +746,7 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 				["messages"]	= 0,
 				["output"]	= 0,
 			}
+			table.insert(channel.sorted, addon_name)
 			channel.sources[addon_name] = source
 		end
 		source.output = source.output + bytes
