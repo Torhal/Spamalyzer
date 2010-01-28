@@ -720,7 +720,12 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 		addons[addon_name] = addon
 		table.insert(sorted_addons, addon_name)
 	else
-		addon.players[player_name] = true
+		local player = addon.players[player_name]
+
+		if not player then
+			addon.players[player_name] = true
+			table.insert(addon.sorted, player_name)
+		end
 		addon.output = addon.output + bytes
 		addon.messages = addon.messages + 1
 	end
