@@ -518,8 +518,8 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 		message = message or ""
 		target = target and (" to "..target..", from ") or ""
 
-		output_frame:AddMessage(string.format("%s%s|r: %s[%s][%s][%s]|r%s%s[%s]|r",
-						      display_color, display_name, color, prefix, message, type, target, color, origin))
+		output_frame:AddMessage(string.format("%s%s|r (|cff%s%s|r): %s[%s] [%s]|r %s %s[%s]|r",
+						      display_color, display_name, CHANNEL_COLORS[type], type, color, prefix, message, target, color, origin))
 	end
 
 	-- Not tracking data from this message type, so stop here.
