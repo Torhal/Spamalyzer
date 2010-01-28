@@ -11,6 +11,12 @@ local pairs = _G.pairs
 local ipairs = _G.ipairs
 
 local tostring = _G.tostring
+local tonumber = _G.tonumber
+
+-------------------------------------------------------------------------------
+-- Localized Blizzard UI globals.
+-------------------------------------------------------------------------------
+local GetTime = _G.GetTime
 
 -------------------------------------------------------------------------------
 -- Addon namespace.
@@ -25,6 +31,7 @@ local LQT		= LibStub("LibQTip-1.0")
 local LDB		= LibStub("LibDataBroker-1.1")
 local LDBIcon		= LibStub("LibDBIcon-1.0")
 local L			= LibStub("AceLocale-3.0"):GetLocale(ADDON_NAME)
+local tekDebug		= tekDebug:GetFrame(ADDON_NAME)
 
 -------------------------------------------------------------------------------
 -- Variables.
@@ -312,7 +319,7 @@ do
 
 			if _G.TipTac and _G.TipTac.AddModifiedTip then
 				-- Pass true as second parameter because hooking OnHide causes C stack overflows
-				TipTac:AddModifiedTip(tooltip, true)
+				_G.TipTac:AddModifiedTip(tooltip, true)
 			end
 		end
 
@@ -435,6 +442,12 @@ end	-- do
 -------------------------------------------------------------------------------
 -- Helper functions.
 -------------------------------------------------------------------------------
+local function Debug(...)
+	if tekDebug then
+		tekDebug:AddMessage(string.join(", ", ...))
+	end
+end
+
 local function GetPlayerClass(player)
 	local guildie = guild_classes[player]
 
@@ -644,6 +657,7 @@ function Spamalyzer:OnInitialize()
 
 	output_frame = CHAT_FRAME_MAP[db.general.display_frame]
 
+	-- Cache the tracking preferences.
 	for track_type, val in pairs(db.tracking) do
 		track_cache[track_type:upper()] = val
 	end
