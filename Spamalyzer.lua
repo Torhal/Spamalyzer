@@ -868,6 +868,12 @@ function Spamalyzer:OnEnable()
 						  table.wipe(sorted_players)
 						  table.wipe(players)
 
+						  table.wipe(sorted_addons)
+						  table.wipe(addons)
+
+						  table.wipe(sorted_channels)
+						  table.wipe(channels)
+
 						  activity.output = 0
 						  activity.input = 0
 						  activity.bytes = 0
