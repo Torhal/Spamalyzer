@@ -367,12 +367,12 @@ do
 		end
 
 		if player_view then
-			for index, entry in ipairs(sorted_players) do
-				local player = players[entry]
+			for index, player_name in ipairs(sorted_players) do
+				local player = players[player_name]
 				local toggled = player.toggled
 
 				line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", player.messages, player.output)
-				tooltip:SetCell(line, 2, string.format("|cff%s%s|r", CLASS_COLORS[player.class] or "cccccc", player.name), "LEFT")
+				tooltip:SetCell(line, 2, string.format("|cff%s%s|r%s", CLASS_COLORS[player.class] or "cccccc", player_name, player.realm or ""), "LEFT")
 
 				tooltip:SetLineScript(line, "OnMouseUp", NameOnMouseUp, index)
 
@@ -401,7 +401,7 @@ do
 						local player = players[player_name]
 
 						line = tooltip:AddLine(" ", " ", player.sources[addon_name].messages, player.sources[addon_name].output)
-						tooltip:SetCell(line, 2, string.format("|cff%s%s|r", CLASS_COLORS[player.class] or "cccccc", player.name), "LEFT")
+						tooltip:SetCell(line, 2, string.format("|cff%s%s|r%s", CLASS_COLORS[player.class] or "cccccc", player_name, player.realm or ""), "LEFT")
 					end
 				end
 			end
@@ -543,7 +543,7 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 	if not player then
 		player = {
 			["class"]	= GetPlayerClass(origin),
-			["name"]	= origin,
+			["name"]	= player_name,
 			["messages"]	= 1,
 			["output"]	= bytes,
 			["sources"]	= {
@@ -554,9 +554,26 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 				}
 			}
 		}
+		if realm then
+			local color = CHANNEL_COLORS[type] or "cccccc"
+
+			player.realm = "|cff"..color.."-"..realm.."|r"
+		end
+
 		players[player_name] = player
 		table.insert(sorted_players, player_name)
 	else
+		-- Sometimes the server doesn't transmit the class or realm. Try again to retrieve them.
+		if not player.class then
+			player.class = GetPlayerClass(origin)
+		end
+
+		if realm then
+			local color = CHANNEL_COLORS[type] or "cccccc"
+
+			player.realm = "|cff"..color.."-"..realm.."|r"
+		end
+
 		local source = player.sources[addon_name]
 
 		if not source then
