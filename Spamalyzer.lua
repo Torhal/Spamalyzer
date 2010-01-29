@@ -158,14 +158,34 @@ local tooltip
 
 local elapsed_line		-- Line in the tooltip where the elapsed time resides.
 
+local ByteStr
+do
+	local MiB = 1024 * 1024
+
+	function ByteStr(bytes)
+		if bytes <= 0 then
+			return "0.000 KiB"
+		end
+
+		if bytes >= MiB then
+			return string.format("%.2f MiB", bytes / MiB)
+		end
+
+		if bytes >= 1024 then
+			return string.format("%.2f KiB", bytes / 1024)
+		end
+		return bytes
+	end
+end
+
 local function UpdateDataFeed()
 	local value = db.datafeed.display
-	data_obj.text = DISPLAY_NAMES[value]..": "..(activity[DISPLAY_VALUES[value]] or _G.NONE)
+	local display = (value <= 3) and ByteStr(activity[DISPLAY_VALUES[value]]) or activity[DISPLAY_VALUES[value]]
+	data_obj.text = DISPLAY_NAMES[value]..": "..(display or _G.NONE)
 end
 
 do
 	local NUM_COLUMNS = 4
-
 	do
 		local function TimeStr(val)
 			local tm = tonumber(val)
@@ -259,7 +279,10 @@ do
 	end
 
 	local ADDON_SORT_FUNCS = {
-		[1]	= function(a, b)	-- Name
+		-------------------------------------------------------------------------------
+		-- Name
+		-------------------------------------------------------------------------------
+		[1]	= function(a, b)
 				  local addon_a, addon_b = addons[a], addons[b]
 
 				  if db.tooltip.sort_ascending then
@@ -268,7 +291,10 @@ do
 				  return addon_a.name > addon_b.name
 			  end,
 
-		[2]	= function(a, b)	-- Bytes
+		-------------------------------------------------------------------------------
+		-- Bytes
+		-------------------------------------------------------------------------------
+		[2]	= function(a, b)
 				  local addon_a, addon_b = addons[a], addons[b]
 
 				  if addon_a.output == addon_b.output then
@@ -284,7 +310,10 @@ do
 				  return addon_a.output > addon_b.output
 			  end,
 
-		[3]	= function(a, b)	-- Messages
+		-------------------------------------------------------------------------------
+		-- Messages
+		-------------------------------------------------------------------------------
+		[3]	= function(a, b)
 				  local addon_a, addon_b = addons[a], addons[b]
 
 				  if addon_a.messages == addon_b.messages then
@@ -302,7 +331,10 @@ do
 	}
 
 	local CHANNEL_SORT_FUNCS = {
-		[1]	= function(a, b)	-- Name
+		-------------------------------------------------------------------------------
+		-- Name
+		-------------------------------------------------------------------------------
+		[1]	= function(a, b)
 				  local channel_a, channel_b = channels[a], channels[b]
 
 				  if db.tooltip.sort_ascending then
@@ -311,7 +343,10 @@ do
 				  return channel_a.name > channel_b.name
 			  end,
 
-		[2]	= function(a, b)	-- Bytes
+		-------------------------------------------------------------------------------
+		-- Bytes
+		-------------------------------------------------------------------------------
+		[2]	= function(a, b)
 				  local channel_a, channel_b = channels[a], channels[b]
 
 				  if channel_a.output == channel_b.output then
@@ -327,7 +362,10 @@ do
 				  return channel_a.output > channel_b.output
 			  end,
 
-		[3]	= function(a, b)	-- Messages
+		-------------------------------------------------------------------------------
+		-- Messages
+		-------------------------------------------------------------------------------
+		[3]	= function(a, b)
 				  local channel_a, channel_b = channels[a], channels[b]
 
 				  if channel_a.messages == channel_b.messages then
@@ -345,7 +383,10 @@ do
 	}
 
 	local PLAYER_SORT_FUNCS = {
-		[1]	= function(a, b)	-- Name
+		-------------------------------------------------------------------------------
+		-- Name
+		-------------------------------------------------------------------------------
+		[1]	= function(a, b)
 				  local player_a, player_b = players[a], players[b]
 
 				  if db.tooltip.sort_ascending then
@@ -354,7 +395,10 @@ do
 				  return player_a.name > player_b.name
 			  end,
 
-		[2]	= function(a, b)	-- Bytes
+		-------------------------------------------------------------------------------
+		-- Bytes
+		-------------------------------------------------------------------------------
+		[2]	= function(a, b)
 				  local player_a, player_b = players[a], players[b]
 
 				  if player_a.output == player_b.output then
@@ -370,7 +414,10 @@ do
 				  return player_a.output > player_b.output
 			  end,
 
-		[3]	= function(a, b)	-- Messages
+		-------------------------------------------------------------------------------
+		-- Messages
+		-------------------------------------------------------------------------------
+		[3]	= function(a, b)
 				  local player_a, player_b = players[a], players[b]
 
 				  if player_a.messages == player_b.messages then
@@ -384,7 +431,7 @@ do
 					  return player_a.messages < player_b.messages
 				  end
 				  return player_a.messages > player_b.messages
-			  end
+			  end,
 	}
 
 	local SORT_FUNC_TABLES = {
@@ -449,13 +496,16 @@ do
 			table.sort(sort_table, sort_funcs[sort_method])
 		end
 
-		if view_mode == 1 then	-- AddOns view
+		if view_mode == 1 then
+			-------------------------------------------------------------------------------
+			-- AddOns view
+			-------------------------------------------------------------------------------
 			for index, addon_name in ipairs(sorted_addons) do
 				local addon = addons[addon_name]
 				local toggled = addon.toggled
 				local color = addon.known and COLOR_GREEN or COLOR_RED
 
-				line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", addon.messages, addon.output)
+				line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", addon.messages, ByteStr(addon.output))
 				tooltip:SetCell(line, 2, string.format("%s%s|r", color, addon_name), "LEFT")
 				tooltip:SetLineScript(line, "OnMouseUp", NameOnMouseUp, index)
 
@@ -467,17 +517,20 @@ do
 					for index, player_name in ipairs(addon.sorted) do
 						local player = players[player_name]
 
-						line = tooltip:AddLine(" ", " ", player.sources[addon_name].messages, player.sources[addon_name].output)
+						line = tooltip:AddLine(" ", " ", player.sources[addon_name].messages, ByteStr(player.sources[addon_name].output))
 						tooltip:SetCell(line, 2, string.format("|cff%s%s|r%s", CLASS_COLORS[player.class] or "cccccc", player_name, player.realm or ""), "LEFT")
 					end
 				end
 			end
-		elseif view_mode == 2 then	-- Channel view
+		elseif view_mode == 2 then
+			-------------------------------------------------------------------------------
+			-- Channel view
+			-------------------------------------------------------------------------------
 			for index, channel_name in ipairs(sorted_channels) do
 				local channel = channels[channel_name]
 				local toggled = channel.toggled
 
-				line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", channel.messages, channel.output)
+				line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", channel.messages, ByteStr(channel.output))
 				tooltip:SetCell(line, 2, channel.name, "LEFT")
 				tooltip:SetLineScript(line, "OnMouseUp", NameOnMouseUp, index)
 
@@ -490,17 +543,20 @@ do
 						local addon = channel.sources[addon_name]
 						local color = addon.known and COLOR_GREEN or COLOR_RED
 
-						line = tooltip:AddLine(" ", " ", addon.messages, addon.output)
+						line = tooltip:AddLine(" ", " ", addon.messages, ByteStr(addon.output))
 						tooltip:SetCell(line, 2, string.format("%s%s|r", color, addon_name), "LEFT")
 					end
 				end
 			end
-		elseif view_mode == 3 then	-- Player view
+		elseif view_mode == 3 then
+			-------------------------------------------------------------------------------
+			-- Player view
+			-------------------------------------------------------------------------------
 			for index, player_name in ipairs(sorted_players) do
 				local player = players[player_name]
 				local toggled = player.toggled
 
-				line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", player.messages, player.output)
+				line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", player.messages, ByteStr(player.output))
 				tooltip:SetCell(line, 2, string.format("|cff%s%s|r%s", CLASS_COLORS[player.class] or "cccccc", player_name, player.realm or ""), "LEFT")
 				tooltip:SetLineScript(line, "OnMouseUp", NameOnMouseUp, index)
 
@@ -513,7 +569,7 @@ do
 						local addon = player.sources[addon_name]
 						local color = addon.known and COLOR_GREEN or COLOR_RED
 
-						line = tooltip:AddLine(" ", " ", addon.messages, addon.output)
+						line = tooltip:AddLine(" ", " ", addon.messages, ByteStr(addon.output))
 						tooltip:SetCell(line, 2, string.format("%s%s|r", color, addon_name), "LEFT")
 					end
 				end
@@ -530,7 +586,9 @@ do
 			tooltip:AddSeparator()
 
 			for index, name in ipairs(DISPLAY_NAMES) do
-				line = tooltip:AddLine(" ", " ", " ", activity[DISPLAY_VALUES[index]])
+				local value = activity[DISPLAY_VALUES[index]]
+
+				line = tooltip:AddLine(" ", " ", " ", (index <= 3) and ByteStr(value) or value)
 				tooltip:SetCell(line, 1, name, "LEFT", 2)
 			end
 		end
