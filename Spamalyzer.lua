@@ -138,9 +138,12 @@ for k, v in pairs(COLOR_TABLE) do
 	CLASS_COLORS[k] = string.format("%2x%2x%2x", v.r * 255, v.g * 255, v.b * 255)
 end
 
--- Populated in Spamalyzer:OnInitialize()
-local CHANNEL_COLORS = {}
+-- Populated in Spamalyzer:UPDATE_CHAT_COLOR()
+local CHANNEL_COLORS
 
+-------------------------------------------------------------------------------
+-- Debugger.
+-------------------------------------------------------------------------------
 local function Debug(...)
 	if debugger then
 		debugger:AddMessage(string.join(", ", ...))
@@ -674,6 +677,7 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 		KNOWN_PREFIXES[prefix] = addon_name
 	end
 	local known = addon_name and true or false	-- If addon_name is nil, we didn't find a match.
+	local channel_color = CHANNEL_COLORS and CHANNEL_COLORS[type] or "cccccc"
 
 	if output_frame and ((known and db.general.display_known) or (not known and db.general.display_unknown)) then
 		local color = tracking and COLOR_PALE_GREEN or COLOR_PINK
@@ -684,7 +688,7 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 		target = target and (" to "..target..", from ") or ""
 
 		output_frame:AddMessage(string.format("%s%s|r (|cff%s%s|r): %s[%s] [%s]|r %s %s[%s]|r",
-						      display_color, display_name, CHANNEL_COLORS[type], CHANNEL_TYPE_NAMES[type], color, prefix, message, target, color, origin))
+						      display_color, display_name, channel_color, CHANNEL_TYPE_NAMES[type], color, prefix, message, target, color, origin))
 	end
 
 	-- Not tracking data from this message type, so stop here.
@@ -723,9 +727,7 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 		table.insert(player.sorted, addon_name)
 
 		if realm then
-			local color = CHANNEL_COLORS[type] or "cccccc"
-
-			player.realm = "|cff"..color.."-"..realm.."|r"
+			player.realm = "|cff"..channel_color.."-"..realm.."|r"
 		end
 
 		players[player_name] = player
@@ -737,9 +739,7 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 		end
 
 		if realm then
-			local color = CHANNEL_COLORS[type] or "cccccc"
-
-			player.realm = "|cff"..color.."-"..realm.."|r"
+			player.realm = "|cff"..channel_color.."-"..realm.."|r"
 		end
 
 		local source = player.sources[addon_name]
@@ -792,7 +792,7 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 
 	if not channel then
 		channel = {
-			["name"]	= "|cff"..CHANNEL_COLORS[type]..CHANNEL_TYPE_NAMES[type].."|r",
+			["name"]	= "|cff"..channel_color..CHANNEL_TYPE_NAMES[type].."|r",
 			["messages"]	= 1,
 			["output"]	= bytes,
 			["sorted"]	= {},
@@ -966,6 +966,8 @@ function Spamalyzer:OnEnable()
 
 	self:RegisterEvent("CHAT_MSG_ADDON")
 	self:RegisterEvent("GUILD_ROSTER_UPDATE")
+	self:RegisterEvent("UPDATE_CHAT_COLOR")
+
 	self:SecureHook("SendAddonMessage")
 
 	-------------------------------------------------------------------------------
@@ -976,20 +978,29 @@ function Spamalyzer:OnEnable()
 	if LDBIcon then
 		LDBIcon:Register(ADDON_NAME, data_obj, db.datafeed.minimap_icon)
 	end
-
-	-- Populate the color table.
-	for track_type, val in pairs(db.tracking) do
-		local upper_type = track_type:upper()
-		local chat_info = _G.ChatTypeInfo[upper_type]
-
-		CHANNEL_COLORS[upper_type] = string.format("%2x%2x%2x", chat_info.r * 255, chat_info.g * 255, chat_info.b * 255)
-	end
 end
 
 function Spamalyzer:OnDisable()
 	for k, v in pairs(timers) do
 		self:CancelTimer(v, true)
 		timers[k] = nil
+	end
+end
+
+-- Channel names may have been set before this event fired, and must be colorized.
+-- This is also fired when the user changes channel colors in the default UI.
+function Spamalyzer:UPDATE_CHAT_COLOR()
+	CHANNEL_COLORS = CHANNEL_COLORS or {}
+
+	for track_type, val in pairs(db.tracking) do
+		local upper_type = track_type:upper()
+		local chat_info = _G.ChatTypeInfo[upper_type]
+
+		CHANNEL_COLORS[upper_type] = string.format("%2x%2x%2x", chat_info.r * 255, chat_info.g * 255, chat_info.b * 255)
+
+		if channels[upper_type] then
+			channels[upper_type].name = "|cff"..CHANNEL_COLORS[upper_type]..CHANNEL_TYPE_NAMES[upper_type].."|r"
+		end
 	end
 end
 
