@@ -451,6 +451,7 @@ do
 
 		if not tooltip then
 			tooltip = LQT:Acquire(ADDON_NAME.."Tooltip", NUM_COLUMNS, "LEFT", "CENTER", "CENTER", "CENTER")
+			tooltip:EnableMouse(true)
 
 			if _G.TipTac and _G.TipTac.AddModifiedTip then
 				-- Pass true as second parameter because hooking OnHide causes C stack overflows
