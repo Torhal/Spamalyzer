@@ -521,7 +521,7 @@ do
 					for index, player_name in ipairs(addon.sorted) do
 						local player = players[player_name]
 
-						line = tooltip:AddLine(" ", " ", player.sources[addon_name].messages, ByteStr(player.sources[addon_name].output))
+						line = tooltip:AddLine(" ", " ", player.addons[addon_name].messages, ByteStr(player.addons[addon_name].output))
 						tooltip:SetCell(line, 2, string.format("|cff%s%s|r%s", CLASS_COLORS[player.class] or "cccccc", player_name, player.realm or ""), "LEFT")
 					end
 				end
@@ -544,7 +544,7 @@ do
 					end
 
 					for index, addon_name in ipairs(channel.sorted) do
-						local addon = channel.sources[addon_name]
+						local addon = channel.addons[addon_name]
 						local color = addon.known and COLOR_GREEN or COLOR_RED
 
 						line = tooltip:AddLine(" ", " ", addon.messages, ByteStr(addon.output))
@@ -570,7 +570,7 @@ do
 					end
 
 					for index, addon_name in ipairs(player.sorted) do
-						local addon = player.sources[addon_name]
+						local addon = player.addons[addon_name]
 						local color = addon.known and COLOR_GREEN or COLOR_RED
 
 						line = tooltip:AddLine(" ", " ", addon.messages, ByteStr(addon.output))
@@ -717,7 +717,7 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 			["messages"]	= 1,
 			["output"]	= bytes,
 			["sorted"]	= {},
-			["sources"]	= {
+			["addons"]	= {
 				[addon_name] = {
 					["messages"]	= 1,
 					["output"]	= bytes,
@@ -743,7 +743,7 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 			player.realm = "|cff"..channel_color.."-"..realm.."|r"
 		end
 
-		local source = player.sources[addon_name]
+		local source = player.addons[addon_name]
 
 		if not source then
 			source = {
@@ -752,7 +752,7 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 				["output"]	= 0,
 			}
 			table.insert(player.sorted, addon_name)
-			player.sources[addon_name] = source
+			player.addons[addon_name] = source
 		end
 		source.output = source.output + bytes
 		source.messages = source.messages + 1
@@ -797,7 +797,7 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 			["messages"]	= 1,
 			["output"]	= bytes,
 			["sorted"]	= {},
-			["sources"]	= {
+			["addons"]	= {
 				[addon_name] = {
 					["messages"]	= 1,
 					["output"]	= bytes,
@@ -809,7 +809,7 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 		channels[type] = channel
 		table.insert(sorted_channels, type)
 	else
-		local source = channel.sources[addon_name]
+		local source = channel.addons[addon_name]
 
 		if not source then
 			source = {
@@ -818,7 +818,7 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 				["output"]	= 0,
 			}
 			table.insert(channel.sorted, addon_name)
-			channel.sources[addon_name] = source
+			channel.addons[addon_name] = source
 		end
 		source.output = source.output + bytes
 		source.messages = source.messages + 1
