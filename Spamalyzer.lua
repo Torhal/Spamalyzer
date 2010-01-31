@@ -167,7 +167,7 @@ do
 
 	function ByteStr(bytes)
 		if bytes <= 0 then
-			return "0.000 KiB"
+			return "0"
 		end
 
 		if bytes >= MiB then
@@ -916,6 +916,7 @@ function Spamalyzer:OnEnable()
 					  timers.elapsed_update = self:ScheduleRepeatingTimer("UpdateElapsed", 1)
 				  end
 			  end,
+		-- OnLeave is an empty function because some LDB displays refuse to display a plugin that has an OnEnter but no OnLeave.
 		OnLeave	= function()
 			  end,
 		OnClick = function(display, button)
