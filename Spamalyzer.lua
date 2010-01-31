@@ -974,10 +974,8 @@ function Spamalyzer:OnEnable()
 
 	self:SecureHook("SendAddonMessage")
 
-	-------------------------------------------------------------------------------
-	-- Cache guild information for later use.
-	-------------------------------------------------------------------------------
-	self:GUILD_ROSTER_UPDATE()
+	-- Wait five seconds to be sure everything is loaded, then request guild information to cache for later use.
+	self:ScheduleTimer(_G.GuildRoster, 5)
 
 	if LDBIcon then
 		LDBIcon:Register(ADDON_NAME, data_obj, db.datafeed.minimap_icon)
