@@ -227,7 +227,9 @@ do
 		function Spamalyzer:UpdateTooltip()
 			last_update = last_update + 1
 
-			if not tooltip then
+			-- Check for tooltip visibility as well, since DockingStation 0.3.3 (and a few versions below)
+			-- handles tooltip hiding _way_ too aggressively.
+			if not tooltip or not tooltip:IsVisible() then
 				self:CancelTimer(timers.tooltip_update)
 				self:CancelTimer(timers.elapsed_update)
 
