@@ -295,6 +295,7 @@ local KNOWN_PREFIXES = {
 	["RD"] = "RogueDamage",
 	["RDX"] = "OpenRDX",
 	["RID"] = "Raid ID",
+	["RRL"] = "Raid Roll",
 	["SRA"] = "SRA",
 	["RTM"] = "RezzTextMonitor",
 	["SGLC"] = "SurgeonGeneral",
