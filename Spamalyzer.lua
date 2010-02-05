@@ -167,7 +167,7 @@ do
 
 	function ByteStr(bytes)
 		if bytes <= 0 then
-			return "0.000 KiB"
+			return "0"
 		end
 
 		if bytes >= MiB then
@@ -227,7 +227,9 @@ do
 		function Spamalyzer:UpdateTooltip()
 			last_update = last_update + 1
 
-			if not tooltip then
+			-- Check for tooltip visibility as well, since DockingStation 0.3.3 (and a few versions below)
+			-- handles tooltip hiding _way_ too aggressively.
+			if not tooltip or not tooltip:IsVisible() then
 				self:CancelTimer(timers.tooltip_update)
 				self:CancelTimer(timers.elapsed_update)
 
@@ -916,6 +918,7 @@ function Spamalyzer:OnEnable()
 					  timers.elapsed_update = self:ScheduleRepeatingTimer("UpdateElapsed", 1)
 				  end
 			  end,
+		-- OnLeave is an empty function because some LDB displays refuse to display a plugin that has an OnEnter but no OnLeave.
 		OnLeave	= function()
 			  end,
 		OnClick = function(display, button)
@@ -971,10 +974,9 @@ function Spamalyzer:OnEnable()
 
 	self:SecureHook("SendAddonMessage")
 
-	-------------------------------------------------------------------------------
-	-- Cache guild information for later use.
-	-------------------------------------------------------------------------------
-	self:GUILD_ROSTER_UPDATE()
+	-- Wait a few seconds to be sure everything is loaded, then request guild and channel information to cache for later use.
+	self:ScheduleTimer(_G.GuildRoster, 5)
+	self:ScheduleTimer("UPDATE_CHAT_COLOR", 5)
 
 	if LDBIcon then
 		LDBIcon:Register(ADDON_NAME, data_obj, db.datafeed.minimap_icon)
