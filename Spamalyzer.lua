@@ -153,7 +153,7 @@ end
 -------------------------------------------------------------------------------
 -- Tooltip and Databroker methods.
 -------------------------------------------------------------------------------
-local DrawTooltip		-- Upvalue needed for chicken-or-egg-syndrome.
+local NUM_COLUMNS = 4
 
 local data_obj
 local LDB_anchor
@@ -188,79 +188,79 @@ local function UpdateDataFeed()
 end
 
 do
-	local NUM_COLUMNS = 4
-	do
-		local function TimeStr(val)
-			local tm = tonumber(val)
+	local function TimeStr(val)
+		local tm = tonumber(val)
 
-			if tm <= 0 then
-				return "0s"
-			end
-			local hours = math.floor(tm / 3600)
-			local minutes = math.floor(tm / 60 - (hours * 60))
-			local seconds = math.floor(tm - hours * 3600 - minutes * 60)
-
-			hours = hours > 0 and (hours.."h") or ""
-			minutes = minutes > 0 and (minutes.."m") or ""
-			seconds = seconds > 0 and (seconds.."s") or ""
-			return hours..minutes..seconds
+		if tm <= 0 then
+			return "0s"
 		end
-		local time_str = TimeStr(GetTime() - epoch)	-- Cached value used between updates.
+		local hours = math.floor(tm / 3600)
+		local minutes = math.floor(tm / 60 - (hours * 60))
+		local seconds = math.floor(tm - hours * 3600 - minutes * 60)
 
-		function Spamalyzer:UpdateElapsed(use_cache)
-			if not elapsed_line or not tooltip then
-				return
-			end
+		hours = hours > 0 and (hours.."h") or ""
+		minutes = minutes > 0 and (minutes.."m") or ""
+		seconds = seconds > 0 and (seconds.."s") or ""
+		return hours..minutes..seconds
+	end
+	local time_str = TimeStr(GetTime() - epoch)	-- Cached value used between updates.
 
-			if use_cache then
-				tooltip:SetCell(elapsed_line, NUM_COLUMNS, time_str)
-				return
-			end
-			time_str = TimeStr(GetTime() - epoch)
+	function Spamalyzer:UpdateElapsed(use_cache)
+		if not elapsed_line or not tooltip then
+			return
+		end
+
+		if use_cache then
 			tooltip:SetCell(elapsed_line, NUM_COLUMNS, time_str)
+			return
 		end
-	end	-- do
+		time_str = TimeStr(GetTime() - epoch)
+		tooltip:SetCell(elapsed_line, NUM_COLUMNS, time_str)
+	end
+end	-- do
 
-	do
-		local last_update = 0
+do
+	local last_update = 0
 
-		function Spamalyzer:UpdateTooltip()
-			last_update = last_update + 1
+	function Spamalyzer:UpdateTooltip()
+		last_update = last_update + 1
 
-			-- Check for tooltip visibility as well, since DockingStation 0.3.3 (and a few versions below)
-			-- handles tooltip hiding _way_ too aggressively.
-			if not tooltip or not tooltip:IsVisible() then
+		-- Check for tooltip visibility as well, since DockingStation 0.3.3 (and a few versions below)
+		-- handles tooltip hiding _way_ too aggressively.
+		if not tooltip or not tooltip:IsVisible() then
+			self:CancelTimer(timers.tooltip_update)
+			self:CancelTimer(timers.elapsed_update)
+
+			timers.tooltip_update = nil
+			timers.elapsed_update = nil
+			LDB_anchor = nil
+			elapsed_line = nil
+			last_update = 0
+			return
+		end
+
+		if tooltip:IsMouseOver() or (LDB_anchor and LDB_anchor:IsMouseOver()) then
+			last_update = 0
+		else
+			local elapsed = last_update * 0.2
+
+			if elapsed >= db.tooltip.timer then
 				self:CancelTimer(timers.tooltip_update)
 				self:CancelTimer(timers.elapsed_update)
 
 				timers.tooltip_update = nil
 				timers.elapsed_update = nil
+				tooltip = LQT:Release(tooltip)
 				LDB_anchor = nil
 				elapsed_line = nil
 				last_update = 0
-				return
-			end
-
-			if tooltip:IsMouseOver() or (LDB_anchor and LDB_anchor:IsMouseOver()) then
-				last_update = 0
-			else
-				local elapsed = last_update * 0.2
-
-				if elapsed >= db.tooltip.timer then
-					self:CancelTimer(timers.tooltip_update)
-					self:CancelTimer(timers.elapsed_update)
-
-					timers.tooltip_update = nil
-					timers.elapsed_update = nil
-					tooltip = LQT:Release(tooltip)
-					LDB_anchor = nil
-					elapsed_line = nil
-					last_update = 0
-				end
 			end
 		end
-	end	-- do
+	end
+end	-- do
 
+local DrawTooltip
+do
 	local function NameOnMouseUp(cell, index)
 		local view_mode = db.tooltip.view_mode
 		local entry
@@ -283,30 +283,45 @@ do
 		DrawTooltip(LDB_anchor)
 	end
 
+	-------------------------------------------------------------------------------
+	-- Sorting
+	-------------------------------------------------------------------------------
+
+	-- Iterator states - when drawing the tooltip, we need to know which AddOn or channel we are currently on so
+	-- we can accurately sort sub-entries. 
+	local addon_iter
+	local channel_iter
+
 	local ADDON_SORT_FUNCS = {
 		-------------------------------------------------------------------------------
 		-- Name
 		-------------------------------------------------------------------------------
 		[1]	= function(a, b)
-				  local addon_a, addon_b = addons[a], addons[b]
-
 				  if db.tooltip.sort_ascending then
-					  return addon_a.name < addon_b.name
+					  return a < b
 				  end
-				  return addon_a.name > addon_b.name
+				  return a > b
 			  end,
 
 		-------------------------------------------------------------------------------
 		-- Bytes
 		-------------------------------------------------------------------------------
 		[2]	= function(a, b)
-				  local addon_a, addon_b = addons[a], addons[b]
+				  local addon_a, addon_b
+
+				  if channel_iter then
+					  local channel = channels[channel_iter]
+
+					  addon_a, addon_b = channel.addons[a], channel.addons[b]
+				  else
+					  addon_a, addon_b = addons[a], addons[b]
+				  end
 
 				  if addon_a.output == addon_b.output then
 					  if db.tooltip.sort_ascending then
-						  return addon_a.name < addon_b.name
+						  return a < b
 					  end
-					  return addon_a.name > addon_b.name
+					  return a > b
 				  end
 
 				  if db.tooltip.sort_ascending then
@@ -319,13 +334,21 @@ do
 		-- Messages
 		-------------------------------------------------------------------------------
 		[3]	= function(a, b)
-				  local addon_a, addon_b = addons[a], addons[b]
+				  local addon_a, addon_b
+
+				  if channel_iter then
+					  local channel = channels[channel_iter]
+
+					  addon_a, addon_b = channel.addons[a], channel.addons[b]
+				  else
+					  addon_a, addon_b = addons[a], addons[b]
+				  end
 
 				  if addon_a.messages == addon_b.messages then
 					  if db.tooltip.sort_ascending then
-						  return addon_a.name < addon_b.name
+						  return a < b
 					  end
-					  return addon_a.name > addon_b.name
+					  return a > b
 				  end
 
 				  if db.tooltip.sort_ascending then
@@ -340,12 +363,10 @@ do
 		-- Name
 		-------------------------------------------------------------------------------
 		[1]	= function(a, b)
-				  local channel_a, channel_b = channels[a], channels[b]
-
 				  if db.tooltip.sort_ascending then
-					  return channel_a.name < channel_b.name
+					  return a < b
 				  end
-				  return channel_a.name > channel_b.name
+				  return a > b
 			  end,
 
 		-------------------------------------------------------------------------------
@@ -356,9 +377,9 @@ do
 
 				  if channel_a.output == channel_b.output then
 					  if db.tooltip.sort_ascending then
-						  return channel_a.name < channel_b.name
+						  return a < b
 					  end
-					  return channel_a.name > channel_b.name
+					  return a > b
 				  end
 
 				  if db.tooltip.sort_ascending then
@@ -375,9 +396,9 @@ do
 
 				  if channel_a.messages == channel_b.messages then
 					  if db.tooltip.sort_ascending then
-						  return channel_a.name < channel_b.name
+						  return a < b
 					  end
-					  return channel_a.name > channel_b.name
+					  return a > b
 				  end
 
 				  if db.tooltip.sort_ascending then
@@ -392,12 +413,10 @@ do
 		-- Name
 		-------------------------------------------------------------------------------
 		[1]	= function(a, b)
-				  local player_a, player_b = players[a], players[b]
-
 				  if db.tooltip.sort_ascending then
-					  return player_a.name < player_b.name
+					  return a < b
 				  end
-				  return player_a.name > player_b.name
+				  return a > b
 			  end,
 
 		-------------------------------------------------------------------------------
@@ -406,11 +425,25 @@ do
 		[2]	= function(a, b)
 				  local player_a, player_b = players[a], players[b]
 
+				  if addon_iter then
+					  if player_a.addons[addon_iter].output == player_b.addons[addon_iter].output then
+						  if db.tooltip.sort_ascending then
+							  return a < b
+						  end
+						  return a > b
+					  end
+
+					  if db.tooltip.sort_ascending then
+						  return player_a.addons[addon_iter].output < player_b.addons[addon_iter].output
+					  end
+					  return player_a.addons[addon_iter].output > player_b.addons[addon_iter].output
+				  end
+
 				  if player_a.output == player_b.output then
 					  if db.tooltip.sort_ascending then
-						  return player_a.name < player_b.name
+						  return a < b
 					  end
-					  return player_a.name > player_b.name
+					  return a > b
 				  end
 
 				  if db.tooltip.sort_ascending then
@@ -425,11 +458,25 @@ do
 		[3]	= function(a, b)
 				  local player_a, player_b = players[a], players[b]
 
+				  if addon_iter then
+					  if player_a.addons[addon_iter].messages == player_b.addons[addon_iter].messages then
+						  if db.tooltip.sort_ascending then
+							  return a < b
+						  end
+						  return a > b
+					  end
+
+					  if db.tooltip.sort_ascending then
+						  return player_a.addons[addon_iter].messages < player_b.addons[addon_iter].messages
+					  end
+					  return player_a.addons[addon_iter].messages > player_b.addons[addon_iter].messages
+				  end
+
 				  if player_a.messages == player_b.messages then
 					  if db.tooltip.sort_ascending then
-						  return player_a.name < player_b.name
+						  return a < b
 					  end
-					  return player_a.name > player_b.name
+					  return a > b
 				  end
 
 				  if db.tooltip.sort_ascending then
@@ -502,6 +549,10 @@ do
 			table.sort(sort_table, sort_funcs[sort_method])
 		end
 
+		-- Reset our iter state.
+		addon_iter = nil
+		channel_iter = nil
+
 		if view_mode == 1 then
 			-------------------------------------------------------------------------------
 			-- AddOns view
@@ -510,6 +561,8 @@ do
 				local addon = addons[addon_name]
 				local toggled = addon.toggled
 				local color = addon.known and COLOR_GREEN or COLOR_RED
+
+				addon_iter = addon_name
 
 				line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", addon.messages, ByteStr(addon.output))
 				tooltip:SetCell(line, 2, string.format("%s%s|r", color, addon_name), "LEFT")
@@ -535,6 +588,8 @@ do
 			for index, channel_name in ipairs(sorted_channels) do
 				local channel = channels[channel_name]
 				local toggled = channel.toggled
+
+				channel_iter = channel_name
 
 				line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", channel.messages, ByteStr(channel.output))
 				tooltip:SetCell(line, 2, channel.name, "LEFT")
