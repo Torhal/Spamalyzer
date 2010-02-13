@@ -136,6 +136,7 @@ local KNOWN_PREFIXES = {
 	["ATR"]					= "Auctionator",
 	["Audio Effects"]			= "AFX",
 	["AucAdvAskPrice"]			= "Auctioneer",
+	["AVR"]						= "Augmented Virtual Reality",
 	["BangCore_TPO"]			= "Bang!Core",
 	["BangWG5"]				= "BangWintergrasp",
 	["BG General*"]				= "Battleground General",
