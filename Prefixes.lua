@@ -20,6 +20,7 @@ local KNOWN_PREFIXES = {
 	["BWVQ3"]				= "BigWigs3",
 	["BWVR3"]				= "BigWigs3",
 	["BWVRA3"]				= "BigWigs3",
+	["BOOTYCALL"]				= "BootyCall",
 	["BossNotes"]				= "Boss Notes",
 	["BOSSTACTICS"]				= "BossTactics",
 	["CastCommLib"]				= "CastCommLib",
