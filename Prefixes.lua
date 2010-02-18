@@ -118,11 +118,9 @@ local KNOWN_PREFIXES = {
 	["\175\150\155"]			= "UNKNOWN_ 6[\175\150\155]",	-- Hunter_whisper", 
 	["]\027L"]				= "UNKNOWN_7!!_[]\027L]",	-- paladin-bg
 	["\016X{"]				= "UNKNOWN_8[\016X{]",	-- warrior-raid
-	["BGSAlertsVersion"]			= "UNKNOWN_9!!!_[BGSAlertsVersion]",
 	["KS2"]= "UNKNOWN_10!!!_KS2",
 	["}\027L"] ="UNNOWN_12!!!_[}\027L",
 	-- ]]--
-
 	["[HA]"]				= "HealAssign",
 	["D?"]					= "ControlArena",
 	["BGGQ"]				= "Gladiator",
@@ -147,12 +145,13 @@ local KNOWN_PREFIXES = {
 	["BDKP-ATT-S"]				= "BananaDKP",
 	["BDKP-DKP-M"]				= "BananaDKP",
 	["BDKP-DKP-S"]				= "BananaDKP",
-	["BG General*"]				= "Battleground General",
-	["vG"]					= "Battleground General",	-- AlteracModule
 	["BEJEWELED2"]				= "Bejeweled",
 	["BEJ2a"]				= "Bejeweled",
 	["BE2"]					= "BossEncounter2",
 	["BFC"]					= "Battlefield Commander",
+	["BGSAlertsVersion"]	= "BGSoundAlerts 2",
+	["BG General*"]				= "Battleground General",
+	["vG"]					= "Battleground General",	-- AlteracModule
 	["BLSS"]				= "Blessed",
 	["BrokerEpicAvg"]			= "Broker:EpicAvg",
 	["BST"]					= "Bonstar",
