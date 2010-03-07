@@ -200,6 +200,7 @@ local KNOWN_PREFIXES = {
 	["ExaminerGlyphs"]			= "Examiner",
 	["eXtremeRaid"]				= "OnRaid",
 	["FBAM"]				= "Fishing Buddy",
+	["G2G"]					= "Guild2Guild",
 	["GathX"]				= "Gatherer",
 	--		GSCR				= not GearScore :(
 	["GHOSTRECON"]				= "Ghost: Recon",
