@@ -230,6 +230,7 @@ local KNOWN_PREFIXES = {
 	["GLDG"]				= "GuildGreet",
 	["GEM3"]				= "GuildEventManager",
 	["GTH"]					= "Getting Things Healed",
+	["G2G"]					= "Guild2Guild",
 	["GuildCraft3"]				= "Guild Craft",
 	["GuildCraft35"]			= "Guild Craft",
 	["GuildSpyVersion"]			= "GuildSpy",
