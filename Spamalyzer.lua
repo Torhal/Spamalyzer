@@ -131,13 +131,6 @@ local COLOR_PALE_GREEN	= "|cffa3feba"
 local COLOR_PINK	= "|cffffbbbb"
 local COLOR_RED		= "|cffff0000"
 
-local COLOR_TABLE = CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS
-local CLASS_COLORS = {}
-
-for k, v in pairs(COLOR_TABLE) do
-	CLASS_COLORS[k] = string.format("%2x%2x%2x", v.r * 255, v.g * 255, v.b * 255)
-end
-
 -- Populated in Spamalyzer:UPDATE_CHAT_COLOR()
 local CHANNEL_COLORS
 
@@ -491,6 +484,13 @@ do
 		[2]	= CHANNEL_SORT_FUNCS,
 		[3]	= PLAYER_SORT_FUNCS,
 	}
+
+	local COLOR_TABLE = CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS
+	local CLASS_COLORS = {}
+
+	for k, v in pairs(COLOR_TABLE) do
+		CLASS_COLORS[k] = string.format("%2x%2x%2x", v.r * 255, v.g * 255, v.b * 255)
+	end
 
 	function DrawTooltip(anchor)
 		if not anchor then
