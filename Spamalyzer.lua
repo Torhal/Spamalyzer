@@ -697,10 +697,6 @@ do
 	end
 end	-- do
 
-local function EscapeChar(c)
-	return ("\\%03d"):format(c:byte())
-end
-
 -- Fired 1.5 seconds after a call to StoreMessage()
 function Spamalyzer:OnMessageUpdate()
 	UpdateDataFeed()
@@ -711,195 +707,196 @@ function Spamalyzer:OnMessageUpdate()
 	timers.message_update = nil
 end
 
-function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
-	local tracking = track_cache[type]
-
-	if not tracking and not output_frame then
-		return
+do
+	local function EscapeChar(c)
+		return ("\\%03d"):format(c:byte())
 	end
-	local addon_name
 
-	if KNOWN_PREFIXES[prefix] then
-		addon_name = KNOWN_PREFIXES[prefix]
-	elseif prefix:match("^$Tranq") then
-		addon_name = "SimpleTranqShot"
-	elseif prefix:match("^vgcomm") then
-		addon_name = "VGComms"
-	elseif prefix:match("^CC_") then
-		addon_name = "ClassChannels"
-	else
-		-- Try escaping it and testing for AceComm-3.0 multi-part.
-		local escaped_prefix = prefix:gsub("[%c\092\128-\255]", EscapeChar)
+	function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
+		local tracking = track_cache[type]
 
-		if escaped_prefix:match(".-\\%d%d%d") then
-			local matched_prefix = escaped_prefix:match("(.-)\\%d%d%d")
+		if not tracking and not output_frame then
+			return
+		end
+		local addon_name
 
-			if KNOWN_PREFIXES[matched_prefix] then
-				addon_name = KNOWN_PREFIXES[matched_prefix]
+		if KNOWN_PREFIXES[prefix] then
+			addon_name = KNOWN_PREFIXES[prefix]
+		elseif prefix:match("^$Tranq") then
+			addon_name = "SimpleTranqShot"
+		elseif prefix:match("^vgcomm") then
+			addon_name = "VGComms"
+		elseif prefix:match("^CC_") then
+			addon_name = "ClassChannels"
+		else
+			-- Try escaping it and testing for AceComm-3.0 multi-part.
+			local escaped_prefix = prefix:gsub("[%c\092\128-\255]", EscapeChar)
+
+			if escaped_prefix:match(".-\\%d%d%d") then
+				local matched_prefix = escaped_prefix:match("(.-)\\%d%d%d")
+
+				if KNOWN_PREFIXES[matched_prefix] then
+					addon_name = KNOWN_PREFIXES[matched_prefix]
+				end
 			end
+			-- Cache this in the prefix table.
+			KNOWN_PREFIXES[prefix] = addon_name
 		end
-		-- Cache this in the prefix table.
-		KNOWN_PREFIXES[prefix] = addon_name
-	end
-	local known = addon_name and true or false	-- If addon_name is nil, we didn't find a match.
-	local channel_color = CHANNEL_COLORS and CHANNEL_COLORS[type] or "cccccc"
+		local known = addon_name and true or false	-- If addon_name is nil, we didn't find a match.
+		local channel_color = CHANNEL_COLORS and CHANNEL_COLORS[type] or "cccccc"
 
-	if output_frame and ((known and db.general.display_known) or (not known and db.general.display_unknown)) then
-		local color = tracking and COLOR_PALE_GREEN or COLOR_PINK
-		local display_name = addon_name or _G.UNKNOWN
-		local display_color = known and COLOR_GREEN or COLOR_RED
+		if output_frame and ((known and db.general.display_known) or (not known and db.general.display_unknown)) then
+			local color = tracking and COLOR_PALE_GREEN or COLOR_PINK
+			local display_name = addon_name or _G.UNKNOWN
+			local display_color = known and COLOR_GREEN or COLOR_RED
 
-		message = message or ""
-		target = target and (" to "..target..", from ") or ""
+			message = message or ""
+			target = target and (" to "..target..", from ") or ""
 
-		output_frame:AddMessage(string.format("%s%s|r (|cff%s%s|r): %s[%s] [%s]|r %s %s[%s]|r",
-						      display_color, display_name, channel_color, CHANNEL_TYPE_NAMES[type], color, prefix, message, target, color, origin))
-	end
-
-	-- Not tracking data from this message type, so stop here.
-	if not tracking then
-		return
-	end
-	local bytes = string.len(prefix) + string.len(message)
-
-	if bytes == 0 then
-		return
-	end
-	addon_name = addon_name or prefix	-- Ensure that addon_name is not nil.
-
-	local player_name, realm = string.split("-", origin, 2)
-
-	-- If the player is on the current realm, player_name will be nil - set it as origin.
-	player_name = player_name or origin
-
-	local player = players[player_name]
-
-	if not player then
-		player = {
-			["name"]	= player_name,
-			["messages"]	= 1,
-			["output"]	= bytes,
-			["sorted"]	= {},
-			["addons"]	= {
-				[addon_name] = {
-					["messages"]	= 1,
-					["output"]	= bytes,
-					["known"]	= known,
-				}
-			}
-		}
-		table.insert(player.sorted, addon_name)
-
-		if realm then
-			player.realm = "|cff"..channel_color.."-"..realm.."|r"
+			output_frame:AddMessage(string.format("%s%s|r (|cff%s%s|r): %s[%s] [%s]|r %s %s[%s]|r",
+							      display_color, display_name, channel_color, CHANNEL_TYPE_NAMES[type], color, prefix, message, target, color, origin))
 		end
 
-		players[player_name] = player
-		table.insert(sorted_players, player_name)
-	else
-
-		if realm then
-			player.realm = "|cff"..channel_color.."-"..realm.."|r"
+		-- Not tracking data from this message type, so stop here.
+		if not tracking then
+			return
 		end
+		local bytes = string.len(prefix) + string.len(message)
 
-		local source = player.addons[addon_name]
-
-		if not source then
-			source = {
-				["known"]	= known,
-				["messages"]	= 0,
-				["output"]	= 0,
-			}
-			table.insert(player.sorted, addon_name)
-			player.addons[addon_name] = source
+		if bytes == 0 then
+			return
 		end
-		source.output = source.output + bytes
-		source.messages = source.messages + 1
+		addon_name = addon_name or prefix	-- Ensure that addon_name is not nil.
 
-		player.messages = player.messages + 1
-		player.output = player.output + bytes
-	end
+		local player_name, realm = string.split("-", origin, 2)
 
-	local addon = addons[addon_name]
+		-- If the player is on the current realm, player_name will be nil - set it as origin.
+		player_name = player_name or origin
 
-	if not addon then
-		addon = {
-			["messages"]	= 1,
-			["output"]	= bytes,
-			["known"]	= known,
-			["name"]	= addon_name,
-			["sorted"]	= {},
-			["players"]	= {
-				[player_name] = true
-			}
-		}
-		table.insert(addon.sorted, player_name)
-
-		addons[addon_name] = addon
-		table.insert(sorted_addons, addon_name)
-	else
-		local player = addon.players[player_name]
+		local player = players[player_name]
 
 		if not player then
-			addon.players[player_name] = true
-			table.insert(addon.sorted, player_name)
-		end
-		addon.output = addon.output + bytes
-		addon.messages = addon.messages + 1
-	end
-
-	local channel = channels[type]
-
-	if not channel then
-		channel = {
-			["name"]	= "|cff"..channel_color..CHANNEL_TYPE_NAMES[type].."|r",
-			["messages"]	= 1,
-			["output"]	= bytes,
-			["sorted"]	= {},
-			["addons"]	= {
-				[addon_name] = {
-					["messages"]	= 1,
-					["output"]	= bytes,
-					["known"]	= known,
+			player = {
+				["name"]	= player_name,
+				["messages"]	= 1,
+				["output"]	= bytes,
+				["sorted"]	= {},
+				["addons"]	= {
+					[addon_name] = {
+						["messages"]	= 1,
+						["output"]	= bytes,
+						["known"]	= known,
+					}
 				}
 			}
-		}
-		table.insert(channel.sorted, addon_name)
-		channels[type] = channel
-		table.insert(sorted_channels, type)
-	else
-		local source = channel.addons[addon_name]
+			table.insert(player.sorted, addon_name)
 
-		if not source then
-			source = {
+			if realm then
+				player.realm = "|cff"..channel_color.."-"..realm.."|r"
+			end
+			players[player_name] = player
+			table.insert(sorted_players, player_name)
+		else
+			if realm then
+				player.realm = "|cff"..channel_color.."-"..realm.."|r"
+			end
+			local source = player.addons[addon_name]
+
+			if not source then
+				source = {
+					["known"]	= known,
+					["messages"]	= 0,
+					["output"]	= 0,
+				}
+				table.insert(player.sorted, addon_name)
+				player.addons[addon_name] = source
+			end
+			source.output = source.output + bytes
+			source.messages = source.messages + 1
+
+			player.messages = player.messages + 1
+			player.output = player.output + bytes
+		end
+		local addon = addons[addon_name]
+
+		if not addon then
+			addon = {
+				["messages"]	= 1,
+				["output"]	= bytes,
 				["known"]	= known,
-				["messages"]	= 0,
-				["output"]	= 0,
+				["name"]	= addon_name,
+				["sorted"]	= {},
+				["players"]	= {
+					[player_name] = true
+				}
+			}
+			table.insert(addon.sorted, player_name)
+
+			addons[addon_name] = addon
+			table.insert(sorted_addons, addon_name)
+		else
+			local player = addon.players[player_name]
+
+			if not player then
+				addon.players[player_name] = true
+				table.insert(addon.sorted, player_name)
+			end
+			addon.output = addon.output + bytes
+			addon.messages = addon.messages + 1
+		end
+		local channel = channels[type]
+
+		if not channel then
+			channel = {
+				["name"]	= "|cff"..channel_color..CHANNEL_TYPE_NAMES[type].."|r",
+				["messages"]	= 1,
+				["output"]	= bytes,
+				["sorted"]	= {},
+				["addons"]	= {
+					[addon_name] = {
+						["messages"]	= 1,
+						["output"]	= bytes,
+						["known"]	= known,
+					}
+				}
 			}
 			table.insert(channel.sorted, addon_name)
-			channel.addons[addon_name] = source
+			channels[type] = channel
+			table.insert(sorted_channels, type)
+		else
+			local source = channel.addons[addon_name]
+
+			if not source then
+				source = {
+					["known"]	= known,
+					["messages"]	= 0,
+					["output"]	= 0,
+				}
+				table.insert(channel.sorted, addon_name)
+				channel.addons[addon_name] = source
+			end
+			source.output = source.output + bytes
+			source.messages = source.messages + 1
+
+			channel.messages = channel.messages + 1
+			channel.output = channel.output + bytes
 		end
-		source.output = source.output + bytes
-		source.messages = source.messages + 1
 
-		channel.messages = channel.messages + 1
-		channel.output = channel.output + bytes
-	end
+		if origin == MY_NAME then
+			activity.output = activity.output + bytes
+			activity.sent = activity.sent + 1
+		else
+			activity.input = activity.input + bytes
+			activity.received = activity.received + 1
+		end
+		activity.bytes = activity.bytes + bytes
+		activity.messages = activity.messages + 1
 
-	if origin == MY_NAME then
-		activity.output = activity.output + bytes
-		activity.sent = activity.sent + 1
-	else
-		activity.input = activity.input + bytes
-		activity.received = activity.received + 1
+		if not timers.message_update then
+			timers.message_update = self:ScheduleTimer("OnMessageUpdate", 1.5)
+		end
 	end
-	activity.bytes = activity.bytes + bytes
-	activity.messages = activity.messages + 1
-
-	if not timers.message_update then
-		timers.message_update = self:ScheduleTimer("OnMessageUpdate", 1.5)
-	end
-end
+end	--do
 
 -------------------------------------------------------------------------------
 -- Hooked functions.
