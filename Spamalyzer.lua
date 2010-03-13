@@ -492,6 +492,19 @@ do
 		CLASS_COLORS[k] = string.format("%2x%2x%2x", v.r * 255, v.g * 255, v.b * 255)
 	end
 
+	local function GetPlayerClass(player)
+		local guildie = guild_classes[player]
+
+		if guildie then
+			return guildie
+		end
+		local _, class_english = _G.UnitClass(player)
+
+		if class_english then
+			return class_english
+		end
+	end
+
 	function DrawTooltip(anchor)
 		if not anchor then
 			return
@@ -575,9 +588,14 @@ do
 
 					for index, player_name in ipairs(addon.sorted) do
 						local player = players[player_name]
+						local class_color = CLASS_COLORS[player.class]
 
+						if not class_color then
+							player.class = GetPlayerClass(player_name)
+							class_color = CLASS_COLORS[player.class]
+						end
 						line = tooltip:AddLine(" ", " ", player.addons[addon_name].messages, ByteStr(player.addons[addon_name].output))
-						tooltip:SetCell(line, 2, string.format("|cff%s%s|r%s", CLASS_COLORS[player.class] or "cccccc", player_name, player.realm or ""), "LEFT")
+						tooltip:SetCell(line, 2, string.format("|cff%s%s|r%s", class_color or "cccccc", player_name, player.realm or ""), "LEFT")
 					end
 				end
 			end
@@ -616,9 +634,14 @@ do
 			for index, player_name in ipairs(sorted_players) do
 				local player = players[player_name]
 				local toggled = player.toggled
+				local class_color = CLASS_COLORS[player.class]
 
+				if not class_color then
+					player.class = GetPlayerClass(player_name)
+					class_color = CLASS_COLORS[player.class]
+				end
 				line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", player.messages, ByteStr(player.output))
-				tooltip:SetCell(line, 2, string.format("|cff%s%s|r%s", CLASS_COLORS[player.class] or "cccccc", player_name, player.realm or ""), "LEFT")
+				tooltip:SetCell(line, 2, string.format("|cff%s%s|r%s", class_color or "cccccc", player_name, player.realm or ""), "LEFT")
 				tooltip:SetLineScript(line, "OnMouseUp", NameOnMouseUp, index)
 
 				if toggled then
@@ -673,22 +696,6 @@ do
 		tooltip:Show()
 	end
 end	-- do
-
--------------------------------------------------------------------------------
--- Helper functions.
--------------------------------------------------------------------------------
-local function GetPlayerClass(player)
-	local guildie = guild_classes[player]
-
-	if guildie then
-		return guildie
-	end
-	local _, class_english = _G.UnitClass(player)
-
-	if class_english then
-		return class_english
-	end
-end
 
 local function EscapeChar(c)
 	return ("\\%03d"):format(c:byte())
@@ -769,7 +776,6 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 
 	if not player then
 		player = {
-			["class"]	= GetPlayerClass(origin),
 			["name"]	= player_name,
 			["messages"]	= 1,
 			["output"]	= bytes,
@@ -791,10 +797,6 @@ function Spamalyzer:StoreMessage(prefix, message, type, origin, target)
 		players[player_name] = player
 		table.insert(sorted_players, player_name)
 	else
-		-- Sometimes the server doesn't transmit the class or realm. Try again to retrieve them.
-		if not player.class then
-			player.class = GetPlayerClass(origin)
-		end
 
 		if realm then
 			player.realm = "|cff"..channel_color.."-"..realm.."|r"
