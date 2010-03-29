@@ -366,6 +366,7 @@ local KNOWN_PREFIXES = {
 	["WL_LOOTCOOLDOWN_NPC"]			= "Wowhead Looter",
 	["WL_LOOTCOOLDOWN_OBJECT"]		= "Wowhead Looter",
 	["WL_LOOTED_NPC"] 			= "Wowhead Looter",
+	["WPNet"]				= "WoW Porty 2",
 	["WQ2"]					= "WoWQuote2",
 	["WRUGSAUTH"]				= "WRUGS Anti-Spam",
 	["YRT2"]				= "YamRaidTracker2",
