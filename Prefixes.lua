@@ -344,6 +344,7 @@ local KNOWN_PREFIXES = {
 	["tomQ2"]				= "tomQuest2",
 	["TotemTracker"]			= "TotemTracker",
 	["tradeDispenser"]			= "Trade Dispenser",
+	["TR_K"]				= "Totem Radius",
 	["TR_L"]				= "Totem Radius",
 	["TSK"]					= "TeamSqueak",
 	["TypI"]				= "TypingNotifier",
