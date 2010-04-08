@@ -320,6 +320,7 @@ local KNOWN_PREFIXES = {
 	["SGLC"]				= "SurgeonGeneral",
 	["SRTi"]				= "Simple Raid Target Icons",
 	["SSAF"]				= "SSArena Frames",
+	["SSN"]					= "SpeakinSpell",
 	["StinkyQ"]				= "StinkyQueue",
 	["Super Duper Macro query"]		= "Super Duper Macro",
 	["Super Duper Macro recFailed"]		= "Super Duper Macro",
