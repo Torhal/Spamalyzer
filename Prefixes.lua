@@ -353,6 +353,7 @@ local KNOWN_PREFIXES = {
 	["Utopia"]				= "Utopia",
 	["Utopia_UpTime"]			= "Utopia",
 	["VisualHeal"]				= "VisualHeal",
+	["Vamp"]				= "Vamp",
 	["VA"]					= "VoidReaverAlarm",	-- version check answer
 	["VC"]					= "VoidReaverAlarm",	-- version check request
 	["CB"]					= "VoidReaverAlarm",	-- 10sec normal mode
