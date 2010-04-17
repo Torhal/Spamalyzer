@@ -2,6 +2,7 @@ local _, namespace = ...
 
 local KNOWN_PREFIXES = {
 	["<AFKTracker> Check Version"]		= "AFKTracker",
+	["AKAT2_"]				= "AKA",
 	["AlgalonObserver"]			= "AlgalonObserver",
 	["ArenaMaster"]				= "Arena Master",
 	["Armory"]				= "Armory",
