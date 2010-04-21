@@ -293,6 +293,7 @@ local KNOWN_PREFIXES = {
 	["PABx39dkes8xj"]			= "Party Ability Bars",
 	["PAB935ndd8xid"]			= "Party Ability Bars",
 	["PABkd8cjnwuid"]			= "Party Ability Bars",
+	["Piece of Justice"]			= "Piece of Justice",
 	["Pit"]					= "PitBull",
 	["PALB"]				= "Paladin Buffer",
 	["PetShopSync"]				= "Pet Shop",
