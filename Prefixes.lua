@@ -139,6 +139,7 @@ local KNOWN_PREFIXES = {
 	["Audio Effects"]			= "AFX",
 	["AucAdvAskPrice"]			= "Auctioneer",
 	["AVR"]					= "Augmented Virtual Reality",
+	["AVRE-1.0"]				= "AVR Encounters",
 	["BangCore_TPO"]			= "Bang!Core",
 	["BangWG5"]				= "BangWintergrasp",
 	["BDKP-REQ"]				= "BananaDKP",
