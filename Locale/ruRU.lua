@@ -1,6 +1,6 @@
 ﻿local ADDON_NAME = ...
 
-local L = LibStub("AceLocale-3.0"):NewLocale(ADDON_NAME, "ruRU", true)
+local L = LibStub("AceLocale-3.0"):NewLocale(ADDON_NAME, "ruRU")
 
 if not L then return end
 
