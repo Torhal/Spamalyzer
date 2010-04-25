@@ -217,6 +217,7 @@ local KNOWN_PREFIXES = {
 	["GearScore_Send"]			= "GearScore",
 	["GearScore_Version"]			= "GearScore",
 	["GoGoMountVER"]			= "GoGoMount",
+	["GRoster"]				= "GuildRoster",
 	["GSY"]					= "GearScore",
 	["GSY_Request"]				= "GearScore",
 	["GSY_Version"]				= "GearScore",
