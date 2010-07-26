@@ -249,6 +249,7 @@ local KNOWN_PREFIXES = {
 	["HealBot_Heals"]			= "HealBot",
 	["HealComm"]				= "LibHealComm-3.0",	-- or version2, you cant tell them apart
 	["HIVE"]				= "HiveMind",
+	["HUD"]					= "HudMap",
 	["IHL"]					= "IncomingHealsLib-1.0",
 	["JambaCommunicationsCommand"]		= "Jamba",	-- multiboxing tool
 	["KALIFCMSG"]				= "Forecast",
