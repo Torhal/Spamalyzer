@@ -1070,7 +1070,9 @@ function Spamalyzer:GUILD_ROSTER_UPDATE()
 	for count = 1, _G.GetNumGuildMembers(true), 1 do
 		local name, _, _, _, _, _, _, _, _, _, class = _G.GetGuildRosterInfo(count)
 
-		guild_classes[name] = class
+		if name and class then
+			guild_classes[name] = class
+		end
 	end
 end
 
