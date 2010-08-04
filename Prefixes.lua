@@ -42,6 +42,7 @@ local KNOWN_PREFIXES = {
 	["ForteWarlock"]			= "ForteXorcist",
 	["Gatherer"]				= "Gatherer",
 	["GUILDMAP"]				= "GuildMap",
+	["LibGuildStorage-1.0"]		= "LibGuildStorage-1.0",
 	["LibVersionCheck"]			= "LibVersionCheck-1.0",
 	["Libzz"]				= "Libzz",
 	["LootFilter"]				= "LootFilter",
