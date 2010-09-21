@@ -377,6 +377,7 @@ local KNOWN_PREFIXES = {
 	["CB"]					= "VoidReaverAlarm",	-- 10sec normal mode
 	["CT"]					= "VoidReaverAlarm",	-- 60sec test mode
 	["VodkaHoldem"]				= "WoWTexasHoldem",
+	["Warden-Player"]		= "Guild Warden",
 	["WGA"]					= "Wintergrasper Advanced",
 	["WgFu"]				= "FuBar_WintergraspFu",
 	["WGTime"]				= "Capping",	-- Wintergrasp-Sync
