@@ -164,6 +164,7 @@ local KNOWN_PREFIXES = {
 	["chatmod"]				= "ChatMOD",
 	["CKICK_SYNC"]				= "Ckick", 
 	["Crb"]					= "CarboniteQuest",
+	["CRT"]					= "Curse Raid Tracker",
 	["CTRA"]				= "CTRaidAssist",
 	["CFUVCQ"]				= "FuBar_ConvergeFU",
 	["CFUVCR"]				= "FuBar_ConvergeFU",   
