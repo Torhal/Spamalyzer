@@ -38,6 +38,7 @@ local KNOWN_PREFIXES = {
 	["DoIKnowYou"]				= "DoIKnowYou",
 	["EASYMOTHER"]				= "EasyMother",
 	["EnsidiaFails"]			= "EnsidiaFails",
+	["EnsidiaFailsWotLK"]		= "EnsidiaFailsWotLK",
 	["eov_version_message"]			= "An eye on viper",
 	["ForteWarlock"]			= "ForteXorcist",
 	["Gatherer"]				= "Gatherer",
