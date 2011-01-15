@@ -161,6 +161,7 @@ local KNOWN_PREFIXES = {
 	["BG General*"]				= "Battleground General",
 	["vG"]					= "Battleground General",	-- AlteracModule
 	["BLSS"]				= "Blessed",
+	["Broker_GuildMoney"]	= "Broker_GuildMoney",
 	["BrokerEpicAvg"]			= "Broker:EpicAvg",
 	["BST"]					= "Bonstar",
 	["cap"]					= "Capping",
