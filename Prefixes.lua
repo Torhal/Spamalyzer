@@ -37,6 +37,7 @@ local KNOWN_PREFIXES = {
 	["DS_Mails"]					= "DataStore",
 	["Death_Tracker"]				= "Death_Tracker",
 	["DoIKnowYou"]					= "DoIKnowYou",
+	["EAILT"]					= "Equipped Average Item Level",
 	["EASYMOTHER"]					= "EasyMother",
 	["EnsidiaFails"]				= "EnsidiaFails",
 	["EnsidiaFailsWotLK"]				= "EnsidiaFailsWotLK",
