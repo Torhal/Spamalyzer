@@ -345,6 +345,7 @@ local KNOWN_PREFIXES = {
 	["TLDB_-NewDrop"]				= "Trookat's Lootdb",
 	["TLDB_-NewMob"]				= "Trookat's Lootdb",
 	["TMW"]						= "TellMeWhen",
+	["TMWSUG"]					= "TellMeWhen",
 	["TMWV"]					= "TellMeWhen",
 	["TR_K"]					= "Totem Radius",
 	["TR_L"]					= "Totem Radius",
