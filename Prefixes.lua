@@ -279,6 +279,7 @@ local KNOWN_PREFIXES = {
 	["RAIDTOTEMS"]					= "TotemTimers",
 	["RAIDVOICE"]					= "RaidVoice",
 	["RAother"]						= "RaidAchievement",
+	["RBA"]						= "RatedBattlegroundAssist",
 	["RBM"]						= "RBM",
 	["RBMPing"]					= "RobBossMods",
 	["RBMPong"]					= "RobBossMods",
