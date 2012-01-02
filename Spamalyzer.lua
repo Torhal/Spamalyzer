@@ -119,12 +119,13 @@ local CHAT_FRAME_MAP = {
 local CHANNEL_TYPE_NAMES = {
 	["BATTLEGROUND"]	= _G.BATTLEGROUND,
 	["GUILD"]		= _G.GUILD,
+	["OFFICER"]		= _G.OFFICER,
 	["PARTY"]		= _G.PARTY,
 	["RAID"]		= _G.RAID,
 	["WHISPER"]		= _G.WHISPER,
 }
 
-local MY_NAME		= UnitName("player")
+local MY_NAME		= _G.UnitName("player")
 
 local COLOR_GREEN	= "|cff00ff00"
 local COLOR_PALE_GREEN	= "|cffa3feba"
@@ -156,7 +157,8 @@ local elapsed_line		-- Line in the tooltip where the elapsed time resides.
 
 local ByteStr
 do
-	local MiB = 1024 * 1024
+	local KiB = 1024
+	local MiB = KiB * KiB
 
 	function ByteStr(bytes)
 		if bytes <= 0 then
@@ -164,11 +166,11 @@ do
 		end
 
 		if bytes >= MiB then
-			return string.format("%.2f MiB", bytes / MiB)
+			return ("%.2f MiB"):format(bytes / MiB)
 		end
 
-		if bytes >= 1024 then
-			return string.format("%.2f KiB", bytes / 1024)
+		if bytes >= KiB then
+			return ("%.2f KiB"):format(bytes / KiB)
 		end
 		return bytes
 	end
@@ -485,11 +487,11 @@ do
 		[3]	= PLAYER_SORT_FUNCS,
 	}
 
-	local COLOR_TABLE = CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS
+	local COLOR_TABLE = _G.CUSTOM_CLASS_COLORS or _G.RAID_CLASS_COLORS
 	local CLASS_COLORS = {}
 
 	for k, v in pairs(COLOR_TABLE) do
-		CLASS_COLORS[k] = string.format("%2x%2x%2x", v.r * 255, v.g * 255, v.b * 255)
+		CLASS_COLORS[k] = ("%2x%2x%2x"):format(v.r * 255, v.g * 255, v.b * 255)
 	end
 
 	local function GetPlayerClass(player)
@@ -578,7 +580,7 @@ do
 				addon_iter = addon_name
 
 				line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", addon.messages, ByteStr(addon.output))
-				tooltip:SetCell(line, 2, string.format("%s%s|r", color, addon_name), "LEFT")
+				tooltip:SetCell(line, 2, ("%s%s|r"):format(color, addon_name), "LEFT")
 				tooltip:SetLineScript(line, "OnMouseUp", NameOnMouseUp, index)
 
 				if toggled then
@@ -595,7 +597,7 @@ do
 							class_color = CLASS_COLORS[player.class]
 						end
 						line = tooltip:AddLine(" ", " ", player.addons[addon_name].messages, ByteStr(player.addons[addon_name].output))
-						tooltip:SetCell(line, 2, string.format("|cff%s%s|r%s", class_color or "cccccc", player_name, player.realm or ""), "LEFT")
+						tooltip:SetCell(line, 2, ("|cff%s%s|r%s"):format(class_color or "cccccc", player_name, player.realm or ""), "LEFT")
 					end
 				end
 			end
@@ -623,7 +625,7 @@ do
 						local color = addon.known and COLOR_GREEN or COLOR_RED
 
 						line = tooltip:AddLine(" ", " ", addon.messages, ByteStr(addon.output))
-						tooltip:SetCell(line, 2, string.format("%s%s|r", color, addon_name), "LEFT")
+						tooltip:SetCell(line, 2, ("%s%s|r"):format(color, addon_name), "LEFT")
 					end
 				end
 			end
@@ -641,7 +643,7 @@ do
 					class_color = CLASS_COLORS[player.class]
 				end
 				line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", player.messages, ByteStr(player.output))
-				tooltip:SetCell(line, 2, string.format("|cff%s%s|r%s", class_color or "cccccc", player_name, player.realm or ""), "LEFT")
+				tooltip:SetCell(line, 2, ("|cff%s%s|r%s"):format(class_color or "cccccc", player_name, player.realm or ""), "LEFT")
 				tooltip:SetLineScript(line, "OnMouseUp", NameOnMouseUp, index)
 
 				if toggled then
@@ -654,7 +656,7 @@ do
 						local color = addon.known and COLOR_GREEN or COLOR_RED
 
 						line = tooltip:AddLine(" ", " ", addon.messages, ByteStr(addon.output))
-						tooltip:SetCell(line, 2, string.format("%s%s|r", color, addon_name), "LEFT")
+						tooltip:SetCell(line, 2, ("%s%s|r"):format(color, addon_name), "LEFT")
 					end
 				end
 			end
@@ -753,8 +755,9 @@ do
 			message = message or ""
 			target = target and (" to "..target..", from ") or ""
 
-			output_frame:AddMessage(string.format("%s%s|r (|cff%s%s|r): %s[%s] [%s]|r %s %s[%s]|r",
-							      display_color, display_name, channel_color, CHANNEL_TYPE_NAMES[type], color, prefix, message, target, color, origin))
+			output_frame:AddMessage(("%s%s|r (|cff%s%s|r): %s[%s] [%s]|r %s %s[%s]|r"):format(
+				display_color, display_name, channel_color, CHANNEL_TYPE_NAMES[type], color, prefix, message, target, color, origin
+			))
 		end
 
 		-- Not tracking data from this message type, so stop here.
@@ -928,6 +931,7 @@ function Spamalyzer:OnInitialize()
 			tracking = {
 				battleground	= false,
 				guild		= false,
+				officer		= false,
 				party		= true,
 				raid		= true,
 				whisper		= true,
@@ -977,15 +981,15 @@ function Spamalyzer:OnEnable()
 			  end,
 		OnClick = function(display, button)
 				  if button == "RightButton" then
-					  local options_frame = InterfaceOptionsFrame
+					  local options_frame = _G.InterfaceOptionsFrame
 
 					  if options_frame:IsVisible() then
 						  options_frame:Hide()
 					  else
-						  InterfaceOptionsFrame_OpenToCategory(Spamalyzer.options_frame)
+						  _G.InterfaceOptionsFrame_OpenToCategory(Spamalyzer.options_frame)
 					  end
 				  elseif button == "LeftButton" then
-					  if IsShiftKeyDown() then
+					  if _G.IsShiftKeyDown() then
 						  table.wipe(sorted_players)
 						  table.wipe(players)
 
@@ -1053,7 +1057,7 @@ function Spamalyzer:UPDATE_CHAT_COLOR()
 		local upper_type = track_type:upper()
 		local chat_info = _G.ChatTypeInfo[upper_type]
 
-		CHANNEL_COLORS[upper_type] = string.format("%2x%2x%2x", chat_info.r * 255, chat_info.g * 255, chat_info.b * 255)
+		CHANNEL_COLORS[upper_type] = ("%2x%2x%2x"):format(chat_info.r * 255, chat_info.g * 255, chat_info.b * 255)
 
 		if channels[upper_type] then
 			channels[upper_type].name = "|cff"..CHANNEL_COLORS[upper_type]..CHANNEL_TYPE_NAMES[upper_type].."|r"
@@ -1088,6 +1092,24 @@ local options
 
 local function GetOptions()
 	if not options then
+		local function CreateTrackingToggle(order, field)
+			local toggle_name = field:upper()
+
+			return {
+				order = order,
+				type = "toggle",
+				name = _G[toggle_name],
+				desc = L["Toggle recording of %s AddOn messages."]:format(_G[toggle_name]),
+				get = function()
+					return db.tracking[field]
+				end,
+				set = function()
+					db.tracking[field] = not db.tracking[field]
+					track_cache[toggle_name] = db.tracking[field]
+				end
+			}
+		end
+
 		options = {
 			name = ADDON_NAME,
 			childGroups = "tab",
@@ -1180,61 +1202,12 @@ local function GetOptions()
 					order	= 30,
 					type	= "group",
 					args	= {
-						battleground = {
-							order	= 10,
-							type	= "toggle",
-							name	= _G.BATTLEGROUND,
-							desc	= string.format(L["Toggle recording of %s AddOn messages."], _G.BATTLEGROUND),
-							get	= function() return db.tracking.battleground end,
-							set	= function()
-									  db.tracking.battleground = not db.tracking.battleground
-									  track_cache["BATTLEGROUND"] = db.tracking.battleground
-								  end,
-						},
-						guild = {
-							order	= 20,
-							type	= "toggle",
-							name	= _G.GUILD,
-							desc	= string.format(L["Toggle recording of %s AddOn messages."], _G.GUILD),
-							get	= function() return db.tracking.guild end,
-							set	= function()
-									  db.tracking.guild = not db.tracking.guild
-									  track_cache["GUILD"] = db.tracking.guild
-								  end,
-						},
-						party = {
-							order	= 30,
-							type	= "toggle",
-							name	= _G.PARTY,
-							desc	= string.format(L["Toggle recording of %s AddOn messages."], _G.PARTY),
-							get	= function() return db.tracking.party end,
-							set	= function()
-									  db.tracking.party = not db.tracking.party
-									  track_cache["PARTY"] = db.tracking.party
-								  end,
-						},
-						raid = {
-							order	= 40,
-							type	= "toggle",
-							name	= _G.RAID,
-							desc	= string.format(L["Toggle recording of %s AddOn messages."], _G.RAID),
-							get	= function() return db.tracking.raid end,
-							set	= function()
-									  db.tracking.raid = not db.tracking.raid
-									  track_cache["RAID"] = db.tracking.raid
-								  end,
-						},
-						whisper	= {
-							order	= 50,
-							type	= "toggle",
-							name	= _G.WHISPER,
-							desc	= string.format(L["Toggle recording of %s AddOn messages."], _G.WHISPER),
-							get	= function() return db.tracking.whisper end,
-							set	= function()
-									  db.tracking.whisper = not db.tracking.whisper
-									  track_cache["WHISPER"] = db.tracking.whisper
-								  end,
-						},
+						battleground = CreateTrackingToggle(10, "battleground"),
+						guild = CreateTrackingToggle(20, "guild"),
+						officer = CreateTrackingToggle(30, "officer"),
+						party = CreateTrackingToggle(40, "party"),
+						raid = CreateTrackingToggle(50, "raid"),
+						whisper	= CreateTrackingToggle(60, "whisper"),
 					},
 				},
 				-------------------------------------------------------------------------------
