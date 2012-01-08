@@ -1032,6 +1032,13 @@ function Spamalyzer:OnEnable()
 
 	self:SecureHook("SendAddonMessage")
 
+	-- Break the server soft cap, as per http://us.battle.net/wow/en/forum/topic/2228413591?page=2#23
+	--@debug@
+	for index = 1, 65 do
+		_G.RegisterAddonMessagePrefix("DEBUG_" .. index)
+	end
+	--@end-debug@
+
 	-- Wait a few seconds to be sure everything is loaded, then request guild and channel information to cache for later use.
 	self:ScheduleTimer(_G.GuildRoster, 5)
 	self:ScheduleTimer("UPDATE_CHAT_COLOR", 5)
