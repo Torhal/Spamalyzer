@@ -1057,9 +1057,8 @@ function Spamalyzer:UPDATE_CHAT_COLOR()
 		local upper_type = track_type:upper()
 		local chat_info = _G.ChatTypeInfo[upper_type]
 
-		CHANNEL_COLORS[upper_type] = ("%2x%2x%2x"):format(chat_info.r * 255, chat_info.g * 255, chat_info.b * 255)
-
-		if channels[upper_type] then
+		if channels[upper_type] and chat_info.r and chat_info.g and chat_info.b then
+			CHANNEL_COLORS[upper_type] = ("%2x%2x%2x"):format(chat_info.r * 255, chat_info.g * 255, chat_info.b * 255)
 			channels[upper_type].name = "|cff"..CHANNEL_COLORS[upper_type]..CHANNEL_TYPE_NAMES[upper_type].."|r"
 		end
 	end
