@@ -314,6 +314,7 @@ local KNOWN_PREFIXES = {
 	["SAYell"]					= "Say Announcer",
 	["SGLC"]					= "SurgeonGeneral",
 	["SMN"]						= "SpamMeNot",
+	["SPOONERROLE"]						= "Spooner",
 	["SRA"]						= "SRA",
 	["SRTI"]					= "Simple Raid Target Icons",
 	["SRTi"]					= "Simple Raid Target Icons",
