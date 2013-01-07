@@ -117,12 +117,12 @@ local CHAT_FRAME_MAP = {
 }
 
 local CHANNEL_TYPE_NAMES = {
-	["BATTLEGROUND"]	= _G.BATTLEGROUND,
-	["GUILD"]		= _G.GUILD,
-	["OFFICER"]		= _G.OFFICER,
-	["PARTY"]		= _G.PARTY,
-	["RAID"]		= _G.RAID,
-	["WHISPER"]		= _G.WHISPER,
+	INSTANCE_CHAT	= _G.INSTANCE_CHAT,
+	GUILD		= _G.GUILD,
+	OFFICER		= _G.OFFICER,
+	PARTY		= _G.PARTY,
+	RAID		= _G.RAID,
+	WHISPER		= _G.WHISPER,
 }
 
 local MY_NAME		= _G.UnitName("player")
