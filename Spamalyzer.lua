@@ -54,12 +54,12 @@ local track_cache	= {}	-- Cached tracking types to avoid constant string.lower()
 
 -- Messages/bytes in/out
 local activity = {
-	["output"]	= 0,
-	["input"]	= 0,
-	["bytes"]	= 0,
-	["sent"]	= 0,
-	["received"]	= 0,
-	["messages"]	= 0,
+	output = 0,
+	input = 0,
+	bytes = 0,
+	sent = 0,
+	received = 0,
+	messages = 0,
 }
 
 local db
@@ -283,7 +283,7 @@ do
 	-------------------------------------------------------------------------------
 
 	-- Iterator states - when drawing the tooltip, we need to know which AddOn or channel we are currently on so
-	-- we can accurately sort sub-entries. 
+	-- we can accurately sort sub-entries.
 	local addon_iter
 	local channel_iter
 
@@ -291,200 +291,200 @@ do
 		-------------------------------------------------------------------------------
 		-- Name
 		-------------------------------------------------------------------------------
-		[1]	= function(a, b)
-				  if db.tooltip.sort_ascending then
-					  return a < b
-				  end
-				  return a > b
-			  end,
+		[1] = function(a, b)
+			if db.tooltip.sort_ascending then
+				return a < b
+			end
+			return a > b
+		end,
 
 		-------------------------------------------------------------------------------
 		-- Bytes
 		-------------------------------------------------------------------------------
-		[2]	= function(a, b)
-				  local addon_a, addon_b
+		[2] = function(a, b)
+			local addon_a, addon_b
 
-				  if channel_iter then
-					  local channel = channels[channel_iter]
+			if channel_iter then
+				local channel = channels[channel_iter]
 
-					  addon_a, addon_b = channel.addons[a], channel.addons[b]
-				  else
-					  addon_a, addon_b = addons[a], addons[b]
-				  end
+				addon_a, addon_b = channel.addons[a], channel.addons[b]
+			else
+				addon_a, addon_b = addons[a], addons[b]
+			end
 
-				  if addon_a.output == addon_b.output then
-					  if db.tooltip.sort_ascending then
-						  return a < b
-					  end
-					  return a > b
-				  end
+			if addon_a.output == addon_b.output then
+				if db.tooltip.sort_ascending then
+					return a < b
+				end
+				return a > b
+			end
 
-				  if db.tooltip.sort_ascending then
-					  return addon_a.output < addon_b.output
-				  end
-				  return addon_a.output > addon_b.output
-			  end,
+			if db.tooltip.sort_ascending then
+				return addon_a.output < addon_b.output
+			end
+			return addon_a.output > addon_b.output
+		end,
 
 		-------------------------------------------------------------------------------
 		-- Messages
 		-------------------------------------------------------------------------------
-		[3]	= function(a, b)
-				  local addon_a, addon_b
+		[3] = function(a, b)
+			local addon_a, addon_b
 
-				  if channel_iter then
-					  local channel = channels[channel_iter]
+			if channel_iter then
+				local channel = channels[channel_iter]
 
-					  addon_a, addon_b = channel.addons[a], channel.addons[b]
-				  else
-					  addon_a, addon_b = addons[a], addons[b]
-				  end
+				addon_a, addon_b = channel.addons[a], channel.addons[b]
+			else
+				addon_a, addon_b = addons[a], addons[b]
+			end
 
-				  if addon_a.messages == addon_b.messages then
-					  if db.tooltip.sort_ascending then
-						  return a < b
-					  end
-					  return a > b
-				  end
+			if addon_a.messages == addon_b.messages then
+				if db.tooltip.sort_ascending then
+					return a < b
+				end
+				return a > b
+			end
 
-				  if db.tooltip.sort_ascending then
-					  return addon_a.messages < addon_b.messages
-				  end
-				  return addon_a.messages > addon_b.messages
-			  end
+			if db.tooltip.sort_ascending then
+				return addon_a.messages < addon_b.messages
+			end
+			return addon_a.messages > addon_b.messages
+		end
 	}
 
 	local CHANNEL_SORT_FUNCS = {
 		-------------------------------------------------------------------------------
 		-- Name
 		-------------------------------------------------------------------------------
-		[1]	= function(a, b)
-				  if db.tooltip.sort_ascending then
-					  return a < b
-				  end
-				  return a > b
-			  end,
+		[1] = function(a, b)
+			if db.tooltip.sort_ascending then
+				return a < b
+			end
+			return a > b
+		end,
 
 		-------------------------------------------------------------------------------
 		-- Bytes
 		-------------------------------------------------------------------------------
-		[2]	= function(a, b)
-				  local channel_a, channel_b = channels[a], channels[b]
+		[2] = function(a, b)
+			local channel_a, channel_b = channels[a], channels[b]
 
-				  if channel_a.output == channel_b.output then
-					  if db.tooltip.sort_ascending then
-						  return a < b
-					  end
-					  return a > b
-				  end
+			if channel_a.output == channel_b.output then
+				if db.tooltip.sort_ascending then
+					return a < b
+				end
+				return a > b
+			end
 
-				  if db.tooltip.sort_ascending then
-					  return channel_a.output < channel_b.output
-				  end
-				  return channel_a.output > channel_b.output
-			  end,
+			if db.tooltip.sort_ascending then
+				return channel_a.output < channel_b.output
+			end
+			return channel_a.output > channel_b.output
+		end,
 
 		-------------------------------------------------------------------------------
 		-- Messages
 		-------------------------------------------------------------------------------
-		[3]	= function(a, b)
-				  local channel_a, channel_b = channels[a], channels[b]
+		[3] = function(a, b)
+			local channel_a, channel_b = channels[a], channels[b]
 
-				  if channel_a.messages == channel_b.messages then
-					  if db.tooltip.sort_ascending then
-						  return a < b
-					  end
-					  return a > b
-				  end
+			if channel_a.messages == channel_b.messages then
+				if db.tooltip.sort_ascending then
+					return a < b
+				end
+				return a > b
+			end
 
-				  if db.tooltip.sort_ascending then
-					  return channel_a.messages < channel_b.messages
-				  end
-				  return channel_a.messages > channel_b.messages
-			  end
+			if db.tooltip.sort_ascending then
+				return channel_a.messages < channel_b.messages
+			end
+			return channel_a.messages > channel_b.messages
+		end
 	}
 
 	local PLAYER_SORT_FUNCS = {
 		-------------------------------------------------------------------------------
 		-- Name
 		-------------------------------------------------------------------------------
-		[1]	= function(a, b)
-				  if db.tooltip.sort_ascending then
-					  return a < b
-				  end
-				  return a > b
-			  end,
+		[1] = function(a, b)
+			if db.tooltip.sort_ascending then
+				return a < b
+			end
+			return a > b
+		end,
 
 		-------------------------------------------------------------------------------
 		-- Bytes
 		-------------------------------------------------------------------------------
-		[2]	= function(a, b)
-				  local player_a, player_b = players[a], players[b]
+		[2] = function(a, b)
+			local player_a, player_b = players[a], players[b]
 
-				  if addon_iter then
-					  if player_a.addons[addon_iter].output == player_b.addons[addon_iter].output then
-						  if db.tooltip.sort_ascending then
-							  return a < b
-						  end
-						  return a > b
-					  end
+			if addon_iter then
+				if player_a.addons[addon_iter].output == player_b.addons[addon_iter].output then
+					if db.tooltip.sort_ascending then
+						return a < b
+					end
+					return a > b
+				end
 
-					  if db.tooltip.sort_ascending then
-						  return player_a.addons[addon_iter].output < player_b.addons[addon_iter].output
-					  end
-					  return player_a.addons[addon_iter].output > player_b.addons[addon_iter].output
-				  end
+				if db.tooltip.sort_ascending then
+					return player_a.addons[addon_iter].output < player_b.addons[addon_iter].output
+				end
+				return player_a.addons[addon_iter].output > player_b.addons[addon_iter].output
+			end
 
-				  if player_a.output == player_b.output then
-					  if db.tooltip.sort_ascending then
-						  return a < b
-					  end
-					  return a > b
-				  end
+			if player_a.output == player_b.output then
+				if db.tooltip.sort_ascending then
+					return a < b
+				end
+				return a > b
+			end
 
-				  if db.tooltip.sort_ascending then
-					  return player_a.output < player_b.output
-				  end
-				  return player_a.output > player_b.output
-			  end,
+			if db.tooltip.sort_ascending then
+				return player_a.output < player_b.output
+			end
+			return player_a.output > player_b.output
+		end,
 
 		-------------------------------------------------------------------------------
 		-- Messages
 		-------------------------------------------------------------------------------
-		[3]	= function(a, b)
-				  local player_a, player_b = players[a], players[b]
+		[3] = function(a, b)
+			local player_a, player_b = players[a], players[b]
 
-				  if addon_iter then
-					  if player_a.addons[addon_iter].messages == player_b.addons[addon_iter].messages then
-						  if db.tooltip.sort_ascending then
-							  return a < b
-						  end
-						  return a > b
-					  end
+			if addon_iter then
+				if player_a.addons[addon_iter].messages == player_b.addons[addon_iter].messages then
+					if db.tooltip.sort_ascending then
+						return a < b
+					end
+					return a > b
+				end
 
-					  if db.tooltip.sort_ascending then
-						  return player_a.addons[addon_iter].messages < player_b.addons[addon_iter].messages
-					  end
-					  return player_a.addons[addon_iter].messages > player_b.addons[addon_iter].messages
-				  end
+				if db.tooltip.sort_ascending then
+					return player_a.addons[addon_iter].messages < player_b.addons[addon_iter].messages
+				end
+				return player_a.addons[addon_iter].messages > player_b.addons[addon_iter].messages
+			end
 
-				  if player_a.messages == player_b.messages then
-					  if db.tooltip.sort_ascending then
-						  return a < b
-					  end
-					  return a > b
-				  end
+			if player_a.messages == player_b.messages then
+				if db.tooltip.sort_ascending then
+					return a < b
+				end
+				return a > b
+			end
 
-				  if db.tooltip.sort_ascending then
-					  return player_a.messages < player_b.messages
-				  end
-				  return player_a.messages > player_b.messages
-			  end,
+			if db.tooltip.sort_ascending then
+				return player_a.messages < player_b.messages
+			end
+			return player_a.messages > player_b.messages
+		end,
 	}
 
 	local SORT_FUNC_TABLES = {
-		[1]	= ADDON_SORT_FUNCS,
-		[2]	= CHANNEL_SORT_FUNCS,
-		[3]	= PLAYER_SORT_FUNCS,
+		ADDON_SORT_FUNCS,
+		CHANNEL_SORT_FUNCS,
+		PLAYER_SORT_FUNCS,
 	}
 
 	local COLOR_TABLE = _G.CUSTOM_CLASS_COLORS or _G.RAID_CLASS_COLORS
@@ -545,7 +545,7 @@ do
 			tooltip:SetCell(elapsed_line, 1, _G.TIME_ELAPSED, "LEFT", 3)
 
 			Spamalyzer:UpdateElapsed(timers.elapsed_update)
-			
+
 			tooltip:Show()
 			return
 		end
@@ -780,15 +780,15 @@ do
 
 		if not player then
 			player = {
-				["name"]	= player_name,
-				["messages"]	= 1,
-				["output"]	= bytes,
-				["sorted"]	= {},
-				["addons"]	= {
+				name = player_name,
+				messages = 1,
+				output = bytes,
+				sorted = {},
+				addons = {
 					[addon_name] = {
-						["messages"]	= 1,
-						["output"]	= bytes,
-						["known"]	= known,
+						messages = 1,
+						output = bytes,
+						known = known,
 					}
 				}
 			}
@@ -807,9 +807,9 @@ do
 
 			if not source then
 				source = {
-					["known"]	= known,
-					["messages"]	= 0,
-					["output"]	= 0,
+					known = known,
+					messages = 0,
+					output = 0,
 				}
 				table.insert(player.sorted, addon_name)
 				player.addons[addon_name] = source
@@ -824,12 +824,12 @@ do
 
 		if not addon then
 			addon = {
-				["messages"]	= 1,
-				["output"]	= bytes,
-				["known"]	= known,
-				["name"]	= addon_name,
-				["sorted"]	= {},
-				["players"]	= {
+				messages = 1,
+				output = bytes,
+				known = known,
+				name = addon_name,
+				sorted = {},
+				players = {
 					[player_name] = true
 				}
 			}
@@ -851,15 +851,15 @@ do
 
 		if not channel then
 			channel = {
-				["name"]	= "|cff"..channel_color..CHANNEL_TYPE_NAMES[type].."|r",
-				["messages"]	= 1,
-				["output"]	= bytes,
-				["sorted"]	= {},
-				["addons"]	= {
+				name = "|cff" .. channel_color .. CHANNEL_TYPE_NAMES[type] .. "|r",
+				messages = 1,
+				output = bytes,
+				sorted = {},
+				addons = {
 					[addon_name] = {
-						["messages"]	= 1,
-						["output"]	= bytes,
-						["known"]	= known,
+						messages = 1,
+						output = bytes,
+						known = known,
 					}
 				}
 			}
@@ -871,9 +871,9 @@ do
 
 			if not source then
 				source = {
-					["known"]	= known,
-					["messages"]	= 0,
-					["output"]	= 0,
+					known = known,
+					messages = 0,
+					output = 0,
 				}
 				table.insert(channel.sorted, addon_name)
 				channel.addons[addon_name] = source
