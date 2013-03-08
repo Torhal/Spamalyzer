@@ -69,8 +69,8 @@ local epoch		= GetTime()	-- Beginning time for AddonMessage tracking.
 -------------------------------------------------------------------------------
 -- Constants.
 -------------------------------------------------------------------------------
-local ICON_PLUS = [[|TInterface\BUTTONS\UI-PlusButton-Up:20:20|t]]
-local ICON_MINUS = [[|TInterface\BUTTONS\UI-MinusButton-Up:20:20|t]]
+local ICON_PLUS = [[|TInterface\BUTTONS\UI-PlusButton-Up:15:15|t]]
+local ICON_MINUS = [[|TInterface\BUTTONS\UI-MinusButton-Up:15:15|t]]
 
 local DISPLAY_NAMES = {
 	L["Output"],
