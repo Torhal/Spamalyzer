@@ -69,6 +69,9 @@ local epoch		= GetTime()	-- Beginning time for AddonMessage tracking.
 -------------------------------------------------------------------------------
 -- Constants.
 -------------------------------------------------------------------------------
+local ICON_PLUS = [[|TInterface\BUTTONS\UI-PlusButton-Up:20:20|t]]
+local ICON_MINUS = [[|TInterface\BUTTONS\UI-MinusButton-Up:20:20|t]]
+
 local DISPLAY_NAMES = {
 	L["Output"],
 	L["Input"],
@@ -557,8 +560,6 @@ do
 		tooltip:SetCellScript(line, 3, "OnMouseUp", SortOnMouseUp, 3)
 		tooltip:SetCellScript(line, 4, "OnMouseUp", SortOnMouseUp, 2)
 
-		local ICON_PLUS = [[|TInterface\BUTTONS\UI-PlusButton-Up:20:20|t]]
-		local ICON_MINUS = [[|TInterface\BUTTONS\UI-MinusButton-Up:20:20|t]]
 		local sort_method = db.tooltip.sorting
 
 		if #sort_table > 1 then
