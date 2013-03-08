@@ -13,6 +13,8 @@ local ipairs = _G.ipairs
 local tostring = _G.tostring
 local tonumber = _G.tonumber
 
+local unpack = _G.unpack
+
 -------------------------------------------------------------------------------
 -- Localized Blizzard UI globals.
 -------------------------------------------------------------------------------
@@ -111,11 +113,6 @@ local CHANNEL_TYPE_NAMES = {
 }
 
 local MY_NAME		= _G.UnitName("player")
-
-local COLOR_GREEN	= "|cff00ff00"
-local COLOR_PALE_GREEN	= "|cffa3feba"
-local COLOR_PINK	= "|cffffbbbb"
-local COLOR_RED		= "|cffff0000"
 
 -- Populated in Spamalyzer:UPDATE_CHAT_COLOR()
 local CHANNEL_COLORS
@@ -434,18 +431,13 @@ do
 		end,
 	}
 
+	local CLASS_COLORS = _G.CUSTOM_CLASS_COLORS or _G.RAID_CLASS_COLORS
+
 	local SORT_FUNC_TABLES = {
 		ADDONS = ADDON_SORT_FUNCS,
 		CHANNEL = CHANNEL_SORT_FUNCS,
 		PLAYER = PLAYER_SORT_FUNCS,
 	}
-
-	local COLOR_TABLE = _G.CUSTOM_CLASS_COLORS or _G.RAID_CLASS_COLORS
-	local CLASS_COLORS = {}
-
-	for class_name, color_data in pairs(COLOR_TABLE) do
-		CLASS_COLORS[class_name] = ("%2x%2x%2x"):format(color_data.r * 255, color_data.g * 255, color_data.b * 255)
-	end
 
 	local function GetPlayerClass(player)
 		local guildie = guild_classes[player]
@@ -477,12 +469,11 @@ do
 			for index, addon_name in ipairs(sorted_addons) do
 				local addon = addons[addon_name]
 				local toggled = addon.toggled
-				local color = addon.known and COLOR_GREEN or COLOR_RED
-
-				addon_iter = addon_name
+				local color_table = addon.known and _G.GREEN_FONT_COLOR or _G.RED_FONT_COLOR
 
 				local line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", addon.messages, ByteStr(addon.output))
-				tooltip:SetCell(line, 2, ("%s%s|r"):format(color, addon_name), "LEFT")
+				tooltip:SetCell(line, 2, addon_name, "LEFT")
+				tooltip:SetCellTextColor(line, 2, color_table.r, color_table.g, color_table.b)
 				tooltip:SetLineScript(line, "OnMouseUp", NameOnMouseUp, index)
 
 				if toggled then
@@ -496,20 +487,20 @@ do
 
 						if not class_color then
 							player.class = GetPlayerClass(player_name)
-							class_color = CLASS_COLORS[player.class]
+							class_color = CLASS_COLORS[player.class] or _G.GRAY_FONT_COLOR
 						end
 						line = tooltip:AddLine(" ", " ", player.addons[addon_name].messages, ByteStr(player.addons[addon_name].output))
-						tooltip:SetCell(line, 2, ("|cff%s%s|r%s"):format(class_color or "cccccc", player_name, player.realm or ""), "LEFT")
+						tooltip:SetCell(line, 2, ("%s%s"):format(player_name, player.realm or ""), "LEFT")
+						tooltip:SetCellTextColor(line, 2, class_color.r, class_color.g, class_color.b)
 					end
 				end
+				addon_iter = addon_name
 			end
 		end,
 		CHANNEL = function(sort_method)
 			for index, channel_name in ipairs(sorted_channels) do
 				local channel = channels[channel_name]
 				local toggled = channel.toggled
-
-				channel_iter = channel_name
 
 				local line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", channel.messages, ByteStr(channel.output))
 				tooltip:SetCell(line, 2, channel.name, "LEFT")
@@ -522,12 +513,14 @@ do
 
 					for index, addon_name in ipairs(channel.sorted) do
 						local addon = channel.addons[addon_name]
-						local color = addon.known and COLOR_GREEN or COLOR_RED
+						local color_table = addon.known and _G.GREEN_FONT_COLOR or _G.RED_FONT_COLOR
 
 						line = tooltip:AddLine(" ", " ", addon.messages, ByteStr(addon.output))
-						tooltip:SetCell(line, 2, ("%s%s|r"):format(color, addon_name), "LEFT")
+						tooltip:SetCell(line, 2, addon_name, "LEFT")
+						tooltip:SetCellTextColor(line, 2, color_table.r, color_table.g, color_table.b)
 					end
 				end
+				channel_iter = channel_name
 			end
 		end,
 		PLAYER = function(sort_method)
@@ -538,10 +531,11 @@ do
 
 				if not class_color then
 					player.class = GetPlayerClass(player_name)
-					class_color = CLASS_COLORS[player.class]
+					class_color = CLASS_COLORS[player.class] or _G.GRAY_FONT_COLOR
 				end
 				local line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", player.messages, ByteStr(player.output))
-				tooltip:SetCell(line, 2, ("|cff%s%s|r%s"):format(class_color or "cccccc", player_name, player.realm or ""), "LEFT")
+				tooltip:SetCell(line, 2, ("%s%s"):format(player_name, player.realm or ""), "LEFT")
+				tooltip:SetCellTextColor(line, 2, class_color.r, class_color.g, class_color.b)
 				tooltip:SetLineScript(line, "OnMouseUp", NameOnMouseUp, index)
 
 				if toggled then
@@ -551,10 +545,11 @@ do
 
 					for index, addon_name in ipairs(player.sorted) do
 						local addon = player.addons[addon_name]
-						local color = addon.known and COLOR_GREEN or COLOR_RED
+						local color_table = addon.known and _G.GREEN_FONT_COLOR or _G.RED_FONT_COLOR
 
 						line = tooltip:AddLine(" ", " ", addon.messages, ByteStr(addon.output))
-						tooltip:SetCell(line, 2, ("%s%s|r"):format(color, addon_name), "LEFT")
+						tooltip:SetCell(line, 2, addon_name, "LEFT")
+						tooltip:SetCellTextColor(line, 2, color_table.r, color_table.g, color_table.b)
 					end
 				end
 			end
@@ -673,6 +668,11 @@ function Spamalyzer:OnMessageUpdate()
 end
 
 do
+	local COLOR_GREEN	= "|cff00ff00"
+	local COLOR_PALE_GREEN	= "|cffa3feba"
+	local COLOR_PINK	= "|cffffbbbb"
+	local COLOR_RED		= "|cffff0000"
+
 	local function EscapeChar(c)
 		return ("\\%03d"):format(c:byte())
 	end
