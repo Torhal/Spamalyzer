@@ -561,6 +561,13 @@ do
 		end,
 	}
 
+	local HINT_TEXTS = {
+		L["Left-click to change datafeed type."],
+		L["Shift+Left-click to clear data."],
+		L["Right-click for options."],
+		L["Middle-click to change tooltip mode."],
+	}
+
 	function DrawTooltip(anchor)
 		if not anchor then
 			return
@@ -576,7 +583,6 @@ do
 				_G.TipTac:AddModifiedTip(tooltip, true)
 			end
 		end
-
 		tooltip:Clear()
 		tooltip:SmartAnchorTo(anchor)
 		tooltip:SetScale(db.tooltip.scale)
@@ -646,17 +652,10 @@ do
 			tooltip:AddSeparator()
 			tooltip:AddSeparator()
 
-			line = tooltip:AddLine()
-			tooltip:SetCell(line, 1, L["Left-click to change datafeed type."], "LEFT", NUM_COLUMNS)
-
-			line = tooltip:AddLine()
-			tooltip:SetCell(line, 1, L["Shift+Left-click to clear data."], "LEFT", NUM_COLUMNS)
-
-			line = tooltip:AddLine()
-			tooltip:SetCell(line, 1, L["Right-click for options."], "LEFT", NUM_COLUMNS)
-
-			line = tooltip:AddLine()
-			tooltip:SetCell(line, 1, L["Middle-click to change tooltip mode."], "LEFT", NUM_COLUMNS)
+			for index = 1, #HINT_TEXTS do
+				line = tooltip:AddLine()
+				tooltip:SetCell(line, 1, HINT_TEXTS[index], "LEFT", NUM_COLUMNS)
+			end
 		end
 		tooltip:UpdateScrolling()
 		tooltip:Show()
