@@ -96,12 +96,6 @@ local VIEW_MODES = {
 	_G.PLAYER,
 }
 
-local SORT_VALUES = {
-	_G.NAME,
-	L["Bytes"],
-	L["Messages"],
-}
-
 local SORT_TABLES = {
 	sorted_addons,
 	sorted_channels,
