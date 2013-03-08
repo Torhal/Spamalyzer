@@ -580,11 +580,13 @@ do
 		tooltip:Clear()
 		tooltip:SmartAnchorTo(anchor)
 		tooltip:SetScale(db.tooltip.scale)
+		tooltip:SetCellMarginV(1)
 
 		local view_mode = db.tooltip.view_mode
 		local line, column = tooltip:AddHeader()
 
 		tooltip:SetCell(line, 1, ADDON_NAME .. " - " .. (VIEW_MODES[view_mode] or VIEW_MODES.PLAYER), "CENTER", NUM_COLUMNS)
+		tooltip:AddSeparator()
 		tooltip:AddSeparator()
 
 		local sort_table = SORT_TABLES[view_mode] or SORT_TABLES.PLAYER
@@ -630,6 +632,7 @@ do
 
 		if db.tooltip.show_stats then
 			tooltip:AddSeparator()
+			tooltip:AddSeparator()
 
 			for index, name in ipairs(DISPLAY_NAMES) do
 				local value = activity[DISPLAY_VALUES[index]]
@@ -640,6 +643,7 @@ do
 		end
 
 		if not db.tooltip.hide_hint then
+			tooltip:AddSeparator()
 			tooltip:AddSeparator()
 
 			line = tooltip:AddLine()
