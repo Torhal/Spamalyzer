@@ -70,50 +70,50 @@ local epoch		= GetTime()	-- Beginning time for AddonMessage tracking.
 -- Constants.
 -------------------------------------------------------------------------------
 local DISPLAY_NAMES = {
-	[1]	= L["Output"],
-	[2]	= L["Input"],
-	[3]	= L["Bytes"],
-	[4]	= L["Sent"],
-	[5]	= L["Received"],
-	[6]	= L["Messages"],
+	L["Output"],
+	L["Input"],
+	L["Bytes"],
+	L["Sent"],
+	L["Received"],
+	L["Messages"],
 }
 
 local DISPLAY_VALUES = {
-	[1]	= "output",
-	[2]	= "input",
-	[3]	= "bytes",
-	[4]	= "sent",
-	[5]	= "received",
-	[6]	= "messages",
+	"output",
+	"input",
+	"bytes",
+	"sent",
+	"received",
+	"messages",
 }
 
 local VIEW_MODES = {
-	[1]	= _G.ADDONS,
-	[2]	= _G.CHANNEL,
-	[3]	= _G.PLAYER,
+	_G.ADDONS,
+	_G.CHANNEL,
+	_G.PLAYER,
 }
 
 local SORT_VALUES = {
-	[1]	= _G.NAME,
-	[2]	= L["Bytes"],
-	[3]	= L["Messages"],
+	_G.NAME,
+	L["Bytes"],
+	L["Messages"],
 }
 
 local SORT_TABLES = {
-	[1]	= sorted_addons,
-	[2]	= sorted_channels,
-	[3]	= sorted_players,
+	sorted_addons,
+	sorted_channels,
+	sorted_players,
 }
 
 local CHAT_FRAME_MAP = {
-	[1]	= nil,
-	[2]	= _G.ChatFrame1,
-	[3]	= _G.ChatFrame2,
-	[4]	= _G.ChatFrame3,
-	[5]	= _G.ChatFrame4,
-	[6]	= _G.ChatFrame5,
-	[7]	= _G.ChatFrame6,
-	[8]	= _G.ChatFrame7,
+	nil,
+	_G.ChatFrame1,
+	_G.ChatFrame2,
+	_G.ChatFrame3,
+	_G.ChatFrame4,
+	_G.ChatFrame5,
+	_G.ChatFrame6,
+	_G.ChatFrame7,
 }
 
 local CHANNEL_TYPE_NAMES = {
@@ -965,7 +965,7 @@ function Spamalyzer:OnEnable()
 		type	= "data source",
 		label	= ADDON_NAME,
 		text	= " ",
-		icon	= "Interface\\Icons\\INV_Letter_16",
+		icon	= [[Interface\Icons\INV_Letter_16]],
 		OnEnter	= function(display, motion)
 				  if not timers.tooltip_update then
 					  DrawTooltip(display)
@@ -1162,14 +1162,14 @@ local function GetOptions()
 									  output_frame = CHAT_FRAME_MAP[value]
 								  end,
 							values	= {
-								[1]	= _G.NONE,
-								[2]	= L["ChatFrame1"],
-								[3]	= L["ChatFrame2"],
-								[4]	= L["ChatFrame3"],
-								[5]	= L["ChatFrame4"],
-								[6]	= L["ChatFrame5"],
-								[7]	= L["ChatFrame6"],
-								[8]	= L["ChatFrame7"],
+								_G.NONE,
+								L["ChatFrame1"],
+								L["ChatFrame2"],
+								L["ChatFrame3"],
+								L["ChatFrame4"],
+								L["ChatFrame5"],
+								L["ChatFrame6"],
+								L["ChatFrame7"],
 							},
 						},
 						display_known = {
