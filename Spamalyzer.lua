@@ -153,7 +153,7 @@ local data_obj
 local LDB_anchor
 local tooltip
 
-local elapsed_line		-- Line in the tooltip where the elapsed time resides.
+local elapsed_line -- Line in the tooltip where the elapsed time resides.
 
 local ByteStr
 do
@@ -179,7 +179,7 @@ end
 local function UpdateDataFeed()
 	local value = db.datafeed.display
 	local display = (value <= 3) and ByteStr(activity[DISPLAY_VALUES[value]]) or activity[DISPLAY_VALUES[value]]
-	data_obj.text = DISPLAY_NAMES[value]..": "..(display or _G.NONE)
+	data_obj.text = DISPLAY_NAMES[value] .. ": " .. (display or _G.NONE)
 end
 
 do
@@ -193,12 +193,13 @@ do
 		local minutes = math.floor(tm / 60 - (hours * 60))
 		local seconds = math.floor(tm - hours * 3600 - minutes * 60)
 
-		hours = hours > 0 and (hours.."h") or ""
-		minutes = minutes > 0 and (minutes.."m") or ""
-		seconds = seconds > 0 and (seconds.."s") or ""
-		return hours..minutes..seconds
+		hours = hours > 0 and (hours .. "h") or ""
+		minutes = minutes > 0 and (minutes .. "m") or ""
+		seconds = seconds > 0 and (seconds .. "s") or ""
+		return hours .. minutes .. seconds
 	end
-	local time_str = TimeStr(GetTime() - epoch)	-- Cached value used between updates.
+
+	local time_str = TimeStr(GetTime() - epoch) -- Cached value used between updates.
 
 	function Spamalyzer:UpdateElapsed(use_cache)
 		if not elapsed_line or not tooltip then
@@ -212,7 +213,7 @@ do
 		time_str = TimeStr(GetTime() - epoch)
 		tooltip:SetCell(elapsed_line, NUM_COLUMNS, time_str)
 	end
-end	-- do
+end -- do
 
 do
 	local last_update = 0
@@ -252,7 +253,7 @@ do
 			end
 		end
 	end
-end	-- do
+end -- do
 
 local DrawTooltip
 do
@@ -514,7 +515,7 @@ do
 		LDB_anchor = anchor
 
 		if not tooltip then
-			tooltip = LQT:Acquire(ADDON_NAME.."Tooltip", NUM_COLUMNS, "LEFT", "CENTER", "CENTER", "CENTER")
+			tooltip = LQT:Acquire(ADDON_NAME .. "Tooltip", NUM_COLUMNS, "LEFT", "CENTER", "CENTER", "CENTER")
 			tooltip:EnableMouse(true)
 
 			if _G.TipTac and _G.TipTac.AddModifiedTip then
@@ -530,7 +531,7 @@ do
 		local view_mode = db.tooltip.view_mode
 		local line, column = tooltip:AddHeader()
 
-		tooltip:SetCell(line, 1, ADDON_NAME.." - "..VIEW_MODES[view_mode], "CENTER", NUM_COLUMNS)
+		tooltip:SetCell(line, 1, ADDON_NAME .. " - " .. VIEW_MODES[view_mode], "CENTER", NUM_COLUMNS)
 		tooltip:AddSeparator()
 
 		local sort_table = SORT_TABLES[view_mode]
@@ -556,9 +557,9 @@ do
 		tooltip:SetCellScript(line, 3, "OnMouseUp", SortOnMouseUp, 3)
 		tooltip:SetCellScript(line, 4, "OnMouseUp", SortOnMouseUp, 2)
 
-		local ICON_PLUS		= [[|TInterface\BUTTONS\UI-PlusButton-Up:20:20|t]]
-		local ICON_MINUS	= [[|TInterface\BUTTONS\UI-MinusButton-Up:20:20|t]]
-		local sort_method	= db.tooltip.sorting
+		local ICON_PLUS = [[|TInterface\BUTTONS\UI-PlusButton-Up:20:20|t]]
+		local ICON_MINUS = [[|TInterface\BUTTONS\UI-MinusButton-Up:20:20|t]]
+		local sort_method = db.tooltip.sorting
 
 		if #sort_table > 1 then
 			table.sort(sort_table, sort_funcs[sort_method])
@@ -697,7 +698,7 @@ do
 		tooltip:UpdateScrolling()
 		tooltip:Show()
 	end
-end	-- do
+end -- do
 
 -- Fired 1.5 seconds after a call to StoreMessage()
 function Spamalyzer:OnMessageUpdate()
@@ -744,7 +745,7 @@ do
 			-- Cache this in the prefix table.
 			KNOWN_PREFIXES[prefix] = addon_name
 		end
-		local known = addon_name and true or false	-- If addon_name is nil, we didn't find a match.
+		local known = addon_name and true or false -- If addon_name is nil, we didn't find a match.
 		local channel_color = CHANNEL_COLORS and CHANNEL_COLORS[type] or "cccccc"
 
 		if output_frame and ((known and db.general.display_known) or (not known and db.general.display_unknown)) then
@@ -753,11 +754,9 @@ do
 			local display_color = known and COLOR_GREEN or COLOR_RED
 
 			message = message or ""
-			target = target and (" to "..target..", from ") or ""
+			target = target and (" to " .. target .. ", from ") or ""
 
-			output_frame:AddMessage(("%s%s|r (|cff%s%s|r): %s[%s] [%s]|r %s %s[%s]|r"):format(
-				display_color, display_name, channel_color, CHANNEL_TYPE_NAMES[type], color, prefix, message, target, color, origin
-			))
+			output_frame:AddMessage(("%s%s|r (|cff%s%s|r): %s[%s] [%s]|r %s %s[%s]|r"):format(display_color, display_name, channel_color, CHANNEL_TYPE_NAMES[type], color, prefix, message, target, color, origin))
 		end
 
 		-- Not tracking data from this message type, so stop here.
@@ -769,7 +768,7 @@ do
 		if bytes == 0 then
 			return
 		end
-		addon_name = addon_name or prefix	-- Ensure that addon_name is not nil.
+		addon_name = addon_name or prefix -- Ensure that addon_name is not nil.
 
 		local player_name, realm = string.split("-", origin, 2)
 
@@ -795,13 +794,13 @@ do
 			table.insert(player.sorted, addon_name)
 
 			if realm then
-				player.realm = "|cff"..channel_color.."-"..realm.."|r"
+				player.realm = "|cff" .. channel_color .. "-" .. realm .. "|r"
 			end
 			players[player_name] = player
 			table.insert(sorted_players, player_name)
 		else
 			if realm then
-				player.realm = "|cff"..channel_color.."-"..realm.."|r"
+				player.realm = "|cff" .. channel_color .. "-" .. realm .. "|r"
 			end
 			local source = player.addons[addon_name]
 
@@ -899,7 +898,7 @@ do
 			timers.message_update = self:ScheduleTimer("OnMessageUpdate", 1.5)
 		end
 	end
-end	--do
+end --do
 
 -------------------------------------------------------------------------------
 -- Hooked functions.
@@ -918,37 +917,37 @@ function Spamalyzer:OnInitialize()
 	local defaults = {
 		global = {
 			datafeed = {
-				display		= 1,	-- Output (in bytes)
-				minimap_icon	= {
-					hide	= false,
+				display = 1, -- Output (in bytes)
+				minimap_icon = {
+					hide = false,
 				},
 			},
 			general = {
-				display_frame	= 1,	-- None.
-				display_known	= true,
-				display_unknown	= true,
+				display_frame = 1, -- None.
+				display_known = true,
+				display_unknown = true,
 			},
 			tracking = {
-				instance_chat	= false,
-				guild		= false,
-				officer		= false,
-				party		= true,
-				raid		= true,
-				whisper		= true,
+				instance_chat = false,
+				guild = false,
+				officer = false,
+				party = true,
+				raid = true,
+				whisper = true,
 			},
 			tooltip = {
-				hide_hint	= false,
-				view_mode	= 3,	-- Player view.
-				show_stats	= false,
-				scale		= 1,
-				sorting		= 1,	-- Name.
-				sort_ascending	= true,
-				timer		= 0.25,
+				hide_hint = false,
+				view_mode = 3, -- Player view.
+				show_stats = false,
+				scale = 1,
+				sorting = 1, -- Name.
+				sort_ascending = true,
+				timer = 0.25,
 			},
 		}
 	}
 
-	local temp_db = LibStub("AceDB-3.0"):New(ADDON_NAME.."DB", defaults)
+	local temp_db = LibStub("AceDB-3.0"):New(ADDON_NAME .. "DB", defaults)
 	db = temp_db.global
 
 	output_frame = CHAT_FRAME_MAP[db.general.display_frame]
@@ -962,67 +961,67 @@ end
 
 function Spamalyzer:OnEnable()
 	data_obj = LDB:NewDataObject(ADDON_NAME, {
-		type	= "data source",
-		label	= ADDON_NAME,
-		text	= " ",
-		icon	= [[Interface\Icons\INV_Letter_16]],
-		OnEnter	= function(display, motion)
-				  if not timers.tooltip_update then
-					  DrawTooltip(display)
-					  timers.tooltip_update = self:ScheduleRepeatingTimer("UpdateTooltip", 0.2)
-				  end
+		type = "data source",
+		label = ADDON_NAME,
+		text = " ",
+		icon = [[Interface\Icons\INV_Letter_16]],
+		OnEnter = function(display, motion)
+			if not timers.tooltip_update then
+				DrawTooltip(display)
+				timers.tooltip_update = self:ScheduleRepeatingTimer("UpdateTooltip", 0.2)
+			end
 
-				  if not timers.elapsed_update then
-					  timers.elapsed_update = self:ScheduleRepeatingTimer("UpdateElapsed", 1)
-				  end
-			  end,
+			if not timers.elapsed_update then
+				timers.elapsed_update = self:ScheduleRepeatingTimer("UpdateElapsed", 1)
+			end
+		end,
+		OnLeave = function()
 		-- OnLeave is an empty function because some LDB displays refuse to display a plugin that has an OnEnter but no OnLeave.
-		OnLeave	= function()
-			  end,
+		end,
 		OnClick = function(display, button)
-				  if button == "RightButton" then
-					  local options_frame = _G.InterfaceOptionsFrame
+			if button == "RightButton" then
+				local options_frame = _G.InterfaceOptionsFrame
 
-					  if options_frame:IsVisible() then
-						  options_frame:Hide()
-					  else
-						  _G.InterfaceOptionsFrame_OpenToCategory(Spamalyzer.options_frame)
-					  end
-				  elseif button == "LeftButton" then
-					  if _G.IsShiftKeyDown() then
-						  table.wipe(sorted_players)
-						  table.wipe(players)
+				if options_frame:IsVisible() then
+					options_frame:Hide()
+				else
+					_G.InterfaceOptionsFrame_OpenToCategory(Spamalyzer.options_frame)
+				end
+			elseif button == "LeftButton" then
+				if _G.IsShiftKeyDown() then
+					table.wipe(sorted_players)
+					table.wipe(players)
 
-						  table.wipe(sorted_addons)
-						  table.wipe(addons)
+					table.wipe(sorted_addons)
+					table.wipe(addons)
 
-						  table.wipe(sorted_channels)
-						  table.wipe(channels)
+					table.wipe(sorted_channels)
+					table.wipe(channels)
 
-						  activity.output = 0
-						  activity.input = 0
-						  activity.bytes = 0
-						  activity.sent = 0
-						  activity.received = 0
-						  activity.messages = 0
+					activity.output = 0
+					activity.input = 0
+					activity.bytes = 0
+					activity.sent = 0
+					activity.received = 0
+					activity.messages = 0
 
-						  epoch = GetTime()
-						  elapsed_line = nil
-						  DrawTooltip(display)
-						  UpdateDataFeed()
-					  else
-						  local cur_val = db.datafeed.display
-						  db.datafeed.display = (cur_val == 6) and 1 or cur_val + 1
-						  UpdateDataFeed()
-					  end
-				  elseif button == "MiddleButton" then
-					  local cur_val = db.tooltip.view_mode
+					epoch = GetTime()
+					elapsed_line = nil
+					DrawTooltip(display)
+					UpdateDataFeed()
+				else
+					local cur_val = db.datafeed.display
+					db.datafeed.display = (cur_val == 6) and 1 or cur_val + 1
+					UpdateDataFeed()
+				end
+			elseif button == "MiddleButton" then
+				local cur_val = db.tooltip.view_mode
 
-					  db.tooltip.view_mode = (cur_val == 3) and 1 or cur_val + 1
-					  elapsed_line = nil
-					  DrawTooltip(display)
-				  end
-			  end,
+				db.tooltip.view_mode = (cur_val == 3) and 1 or cur_val + 1
+				elapsed_line = nil
+				DrawTooltip(display)
+			end
+		end,
 	})
 	UpdateDataFeed()
 
@@ -1066,7 +1065,7 @@ function Spamalyzer:UPDATE_CHAT_COLOR()
 
 		if channels[upper_type] and chat_info.r and chat_info.g and chat_info.b then
 			CHANNEL_COLORS[upper_type] = ("%2x%2x%2x"):format(chat_info.r * 255, chat_info.g * 255, chat_info.b * 255)
-			channels[upper_type].name = "|cff"..CHANNEL_COLORS[upper_type]..CHANNEL_TYPE_NAMES[upper_type].."|r"
+			channels[upper_type].name = "|cff" .. CHANNEL_COLORS[upper_type] .. CHANNEL_TYPE_NAMES[upper_type] .. "|r"
 		end
 	end
 end
@@ -1125,43 +1124,43 @@ local function GetOptions()
 				-- General options.
 				-------------------------------------------------------------------------------
 				general = {
-					name	= _G.GENERAL_LABEL,
-					order	= 10,
-					type	= "group",
-					args	= {
+					name = _G.GENERAL_LABEL,
+					order = 10,
+					type = "group",
+					args = {
 						minimap_icon = {
-							order	= 10,
-							type	= "toggle",
-							width	= "full",
-							name	= L["Minimap Icon"],
-							desc	= L["Draws the icon on the minimap."],
-							get	= function()
-									  return not db.datafeed.minimap_icon.hide
-								  end,
-							set	= function(info, value)
-									  db.datafeed.minimap_icon.hide = not value
+							order = 10,
+							type = "toggle",
+							width = "full",
+							name = L["Minimap Icon"],
+							desc = L["Draws the icon on the minimap."],
+							get = function()
+								return not db.datafeed.minimap_icon.hide
+							end,
+							set = function(info, value)
+								db.datafeed.minimap_icon.hide = not value
 
-									  LDBIcon[value and "Show" or "Hide"](LDBIcon, ADDON_NAME)
-								  end,
+								LDBIcon[value and "Show" or "Hide"](LDBIcon, ADDON_NAME)
+							end,
 						},
 						spacer1 = {
-							order	= 11,
-							type	= "description",
-							name	= "\n",
+							order = 11,
+							type = "description",
+							name = "\n",
 						},
 						display_frame = {
-							order	= 20,
-							type	= "select",
-							name	= _G.DISPLAY_OPTIONS,
-							desc	= L["Secondary location to display AddOn messages."],
-							get	= function()
-									  return db.general.display_frame
-								  end,
-							set	= function(info, value)
-									  db.general.display_frame = value
-									  output_frame = CHAT_FRAME_MAP[value]
-								  end,
-							values	= {
+							order = 20,
+							type = "select",
+							name = _G.DISPLAY_OPTIONS,
+							desc = L["Secondary location to display AddOn messages."],
+							get = function()
+								return db.general.display_frame
+							end,
+							set = function(info, value)
+								db.general.display_frame = value
+								output_frame = CHAT_FRAME_MAP[value]
+							end,
+							values = {
 								_G.NONE,
 								L["ChatFrame1"],
 								L["ChatFrame2"],
@@ -1173,30 +1172,30 @@ local function GetOptions()
 							},
 						},
 						display_known = {
-							order	= 30,
-							type	= "toggle",
-							width	= "full",
-							name	= L["Display Known"],
-							desc	= L["Display messages from known AddOns in the ChatFrame."],
-							get	= function()
-									  return db.general.display_known
-								  end,
-							set	= function(info, value)
-									  db.general.display_known = value
-								  end,
+							order = 30,
+							type = "toggle",
+							width = "full",
+							name = L["Display Known"],
+							desc = L["Display messages from known AddOns in the ChatFrame."],
+							get = function()
+								return db.general.display_known
+							end,
+							set = function(info, value)
+								db.general.display_known = value
+							end,
 						},
 						display_unknown = {
-							order	= 40,
-							type	= "toggle",
-							width	= "full",
-							name	= L["Display Unknown"],
-							desc	= L["Display messages from unknown AddOns in the ChatFrame."],
-							get	= function()
-									  return db.general.display_unknown
-								  end,
-							set	= function(info, value)
-									  db.general.display_unknown = value
-								  end,
+							order = 40,
+							type = "toggle",
+							width = "full",
+							name = L["Display Unknown"],
+							desc = L["Display messages from unknown AddOns in the ChatFrame."],
+							get = function()
+								return db.general.display_unknown
+							end,
+							set = function(info, value)
+								db.general.display_unknown = value
+							end,
 						},
 					},
 				},
@@ -1204,83 +1203,83 @@ local function GetOptions()
 				-- Tracking options.
 				-------------------------------------------------------------------------------
 				tracking = {
-					name	= L["Tracking"],
-					order	= 30,
-					type	= "group",
-					args	= {
+					name = L["Tracking"],
+					order = 30,
+					type = "group",
+					args = {
 						instance_chat = CreateTrackingToggle(10, "instance_chat"),
 						guild = CreateTrackingToggle(20, "guild"),
 						officer = CreateTrackingToggle(30, "officer"),
 						party = CreateTrackingToggle(40, "party"),
 						raid = CreateTrackingToggle(50, "raid"),
-						whisper	= CreateTrackingToggle(60, "whisper"),
+						whisper = CreateTrackingToggle(60, "whisper"),
 					},
 				},
 				-------------------------------------------------------------------------------
 				-- Tooltip options.
 				-------------------------------------------------------------------------------
 				tooltip = {
-					name	= L["Tooltip"],
-					order	= 40,
-					type	= "group",
-					args	= {
+					name = L["Tooltip"],
+					order = 40,
+					type = "group",
+					args = {
 						scale = {
-							order	= 10,
-							type	= "range",
-							width	= "full",
-							name	= L["Scale"],
-							desc	= L["Move the slider to adjust the scale of the tooltip."],
-							min	= 0.5,
-							max	= 1.5,
-							step	= 0.01,
-							get	= function()
-									  return db.tooltip.scale
-								  end,
-							set	= function(info, value)
-									  db.tooltip.scale = math.max(0.5, math.min(1.5, value))
-								  end,
+							order = 10,
+							type = "range",
+							width = "full",
+							name = L["Scale"],
+							desc = L["Move the slider to adjust the scale of the tooltip."],
+							min = 0.5,
+							max = 1.5,
+							step = 0.01,
+							get = function()
+								return db.tooltip.scale
+							end,
+							set = function(info, value)
+								db.tooltip.scale = math.max(0.5, math.min(1.5, value))
+							end,
 						},
 						timer = {
-							order	= 20,
-							type	= "range",
-							width	= "full",
-							name	= L["Timer"],
-							desc	= L["Move the slider to adjust the tooltip fade time."],
-							min	= 0.2,
-							max	= 2,
-							step	= 0.1,
-							get	= function()
-									  return db.tooltip.timer
-								  end,
-							set	= function(info, value)
-									  db.tooltip.timer = math.max(0.2, math.min(2, value))
-								  end,
+							order = 20,
+							type = "range",
+							width = "full",
+							name = L["Timer"],
+							desc = L["Move the slider to adjust the tooltip fade time."],
+							min = 0.2,
+							max = 2,
+							step = 0.1,
+							get = function()
+								return db.tooltip.timer
+							end,
+							set = function(info, value)
+								db.tooltip.timer = math.max(0.2, math.min(2, value))
+							end,
 						},
 						hide_hint = {
-							order	= 30,
-							type	= "toggle",
-							width	= "full",
-							name	= L["Hide Hint Text"],
-							desc	= L["Hides the hint text at the bottom of the tooltip."],
-							get	= function()
-									  return db.tooltip.hide_hint
-								  end,
-							set	= function(info, value)
-									  db.tooltip.hide_hint = value
-								  end,
+							order = 30,
+							type = "toggle",
+							width = "full",
+							name = L["Hide Hint Text"],
+							desc = L["Hides the hint text at the bottom of the tooltip."],
+							get = function()
+								return db.tooltip.hide_hint
+							end,
+							set = function(info, value)
+								db.tooltip.hide_hint = value
+							end,
 						},
 						show_stats = {
-							order	= 40,
-							type	= "toggle",
-							width	= "full",
-							name	= _G.STATISTICS,
-							desc	= L["Show traffic statistics at the bottom of the tooltip."],
-							get	= function()
-									  return db.tooltip.show_stats
-								  end,
-							set	= function(info, value)
-									  db.tooltip.show_stats = value
-								  end,
+							order = 40,
+							type = "toggle",
+							width = "full",
+							name = _G.STATISTICS,
+							desc = L["Show traffic statistics at the bottom of the tooltip."],
+							get = function()
+								return db.tooltip.show_stats
+							end,
+							set = function(info, value)
+								db.tooltip.show_stats = value
+							end,
 						},
 					},
 				},
