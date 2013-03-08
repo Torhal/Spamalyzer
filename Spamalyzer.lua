@@ -494,8 +494,8 @@ do
 	local COLOR_TABLE = _G.CUSTOM_CLASS_COLORS or _G.RAID_CLASS_COLORS
 	local CLASS_COLORS = {}
 
-	for k, v in pairs(COLOR_TABLE) do
-		CLASS_COLORS[k] = ("%2x%2x%2x"):format(v.r * 255, v.g * 255, v.b * 255)
+	for class_name, color_data in pairs(COLOR_TABLE) do
+		CLASS_COLORS[class_name] = ("%2x%2x%2x"):format(color_data.r * 255, color_data.g * 255, color_data.b * 255)
 	end
 
 	local function GetPlayerClass(player)
@@ -1049,9 +1049,9 @@ function Spamalyzer:OnEnable()
 end
 
 function Spamalyzer:OnDisable()
-	for k, v in pairs(timers) do
-		self:CancelTimer(v, true)
-		timers[k] = nil
+	for handle, timer in pairs(timers) do
+		self:CancelTimer(timer, true)
+		timers[handle] = nil
 	end
 end
 
