@@ -929,7 +929,7 @@ function Spamalyzer:OnInitialize()
 				display_unknown	= true,
 			},
 			tracking = {
-				battleground	= false,
+				instance_chat	= false,
 				guild		= false,
 				officer		= false,
 				party		= true,
@@ -1208,7 +1208,7 @@ local function GetOptions()
 					order	= 30,
 					type	= "group",
 					args	= {
-						battleground = CreateTrackingToggle(10, "battleground"),
+						instance_chat = CreateTrackingToggle(10, "instance_chat"),
 						guild = CreateTrackingToggle(20, "guild"),
 						officer = CreateTrackingToggle(30, "officer"),
 						party = CreateTrackingToggle(40, "party"),
