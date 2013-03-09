@@ -25,7 +25,8 @@ local GetTime = _G.GetTime
 -------------------------------------------------------------------------------
 local ADDON_NAME, namespace	= ...
 
-local KNOWN_PREFIXES		= namespace.prefixes
+local KNOWN_PREFIXES	= namespace.known_prefixes
+local MATCHED_PREFIXES	= namespace.matched_prefixes
 
 local LibStub		= _G.LibStub
 local Spamalyzer	= LibStub("AceAddon-3.0"):NewAddon(ADDON_NAME, "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
@@ -683,29 +684,30 @@ do
 		if not tracking and not output_frame then
 			return
 		end
-		local addon_name
+		local addon_name = KNOWN_PREFIXES[prefix]
 
-		if KNOWN_PREFIXES[prefix] then
-			addon_name = KNOWN_PREFIXES[prefix]
-		elseif prefix:match("^$Tranq") then
-			addon_name = "SimpleTranqShot"
-		elseif prefix:match("^vgcomm") then
-			addon_name = "VGComms"
-		elseif prefix:match("^CC_") then
-			addon_name = "ClassChannels"
-		else
-			-- Try escaping it and testing for AceComm-3.0 multi-part.
-			local escaped_prefix = prefix:gsub("[%c\092\128-\255]", EscapeChar)
-
-			if escaped_prefix:match(".-\\%d%d%d") then
-				local matched_prefix = escaped_prefix:match("(.-)\\%d%d%d")
-
-				if KNOWN_PREFIXES[matched_prefix] then
-					addon_name = KNOWN_PREFIXES[matched_prefix]
+		if not addon_name then
+			for partial, match_name in pairs(MATCHED_PREFIXES) do
+				if prefix:match(partial) then
+					addon_name = match_name
+					break
 				end
 			end
-			-- Cache this in the prefix table.
-			KNOWN_PREFIXES[prefix] = addon_name
+
+			if not addon_name then
+				-- Try escaping it and testing for AceComm-3.0 multi-part.
+				local escaped_prefix = prefix:gsub("[%c\092\128-\255]", EscapeChar)
+
+				if escaped_prefix:match(".-\\%d%d%d") then
+					local matched_prefix = escaped_prefix:match("(.-)\\%d%d%d")
+
+					if KNOWN_PREFIXES[matched_prefix] then
+						addon_name = KNOWN_PREFIXES[matched_prefix]
+					end
+				end
+				-- Cache this in the prefix table.
+				KNOWN_PREFIXES[prefix] = addon_name
+			end
 		end
 		local known = addon_name and true or false -- If addon_name is nil, we didn't find a match.
 		local channel_color = CHANNEL_COLORS and CHANNEL_COLORS[type] or "cccccc"

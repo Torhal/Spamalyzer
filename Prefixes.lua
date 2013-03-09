@@ -1,7 +1,17 @@
 local _, namespace = ...
 
-local KNOWN_PREFIXES = {
+-- These are partial-match prefixes.
+local MATCHED_PREFIXES = {
+	["^$Tranq"]	 = "SimpleTranqShot",
+	["^vgcomm"]	 = "VGComms",
+	["^CC_"]	 = "ClassChannels",
+}
 
+namespace.matched_prefixes = MATCHED_PREFIXES
+
+
+-- These prefixes are full matches.
+local KNOWN_PREFIXES = {
 	[")\252$"]					= "AceComm [VersionCheck]",	-- Hash of "Version". VersionChecker also uses
 	[".\136="]					= "Proximo",
 	["2\224\237"]					= "Cartographer [Guild Positions]",
@@ -467,4 +477,4 @@ local KNOWN_PREFIXES = {
 	["\137\016"]					= "Cartographer [Notes]",
 }
 
-namespace.prefixes = KNOWN_PREFIXES
+namespace.known_prefixes = KNOWN_PREFIXES
