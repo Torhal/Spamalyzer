@@ -709,13 +709,12 @@ do
 				KNOWN_PREFIXES[prefix] = addon_name
 			end
 		end
-		local known = addon_name and true or false -- If addon_name is nil, we didn't find a match.
 		local channel_color = CHANNEL_COLORS and CHANNEL_COLORS[type] or "cccccc"
 
-		if output_frame and ((known and db.general.display_known) or (not known and db.general.display_unknown)) then
+		if output_frame and ((addon_name and db.general.display_known) or (not addon_name and db.general.display_unknown)) then
 			local color = tracking and COLOR_PALE_GREEN or COLOR_PINK
 			local display_name = addon_name or _G.UNKNOWN
-			local display_color = known and COLOR_GREEN or COLOR_RED
+			local display_color = addon_name and COLOR_GREEN or COLOR_RED
 
 			message = message or ""
 			target = target and (" to " .. target .. ", from ") or ""
@@ -751,7 +750,7 @@ do
 					[addon_name] = {
 						messages = 1,
 						output = bytes,
-						known = known,
+						known = addon_name and true or false,
 					}
 				}
 			}
@@ -770,7 +769,7 @@ do
 
 			if not source then
 				source = {
-					known = known,
+					known = addon_name and true or false,
 					messages = 0,
 					output = 0,
 				}
@@ -789,7 +788,7 @@ do
 			addon = {
 				messages = 1,
 				output = bytes,
-				known = known,
+				known = addon_name and true or false,
 				name = addon_name,
 				sorted = {},
 				players = {
@@ -822,7 +821,7 @@ do
 					[addon_name] = {
 						messages = 1,
 						output = bytes,
-						known = known,
+						known = addon_name and true or false,
 					}
 				}
 			}
@@ -834,7 +833,7 @@ do
 
 			if not source then
 				source = {
-					known = known,
+					known = addon_name and true or false,
 					messages = 0,
 					output = 0,
 				}
