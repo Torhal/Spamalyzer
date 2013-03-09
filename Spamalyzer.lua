@@ -616,7 +616,7 @@ do
 		local sort_method = db.tooltip.sorting
 
 		if #sort_table > 1 then
-			table.sort(sort_table, sort_funcs[sort_method] or sort_funcs.NAME)
+			table.sort(sort_table, sort_funcs[sort_method] or sort_funcs.name)
 		end
 
 		-- Reset our iter state.
@@ -899,10 +899,10 @@ function Spamalyzer:OnInitialize()
 			},
 			tooltip = {
 				hide_hint = false,
-				view_mode = 3, -- Player view.
+				view_mode = "PLAYER",
 				show_stats = false,
 				scale = 1,
-				sorting = 1, -- Name.
+				sorting = "name",
 				sort_ascending = true,
 				timer = 0.25,
 			},
