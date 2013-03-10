@@ -471,8 +471,11 @@ do
 				local color_table = addon.known and _G.GREEN_FONT_COLOR or _G.RED_FONT_COLOR
 
 				local line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", addon.messages, ByteStr(addon.output))
+				tooltip:SetLineColor(line, 0.63921568627451, 0.63921568627451, 0.63921568627451)
+
 				tooltip:SetCell(line, 2, addon_name, "LEFT")
 				tooltip:SetCellTextColor(line, 2, color_table.r, color_table.g, color_table.b)
+				tooltip:SetCellColor(line, 3, 0.63921568627451, 0.63921568627451, 0.63921568627451)
 				tooltip:SetLineScript(line, "OnMouseUp", NameOnMouseUp, index)
 
 				if toggled then
@@ -502,7 +505,10 @@ do
 				local toggled = channel.toggled
 
 				local line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", channel.messages, ByteStr(channel.output))
+				tooltip:SetLineColor(line, 0.63921568627451, 0.63921568627451, 0.63921568627451)
+
 				tooltip:SetCell(line, 2, channel.name, "LEFT")
+				tooltip:SetCellColor(line, 3, 0.63921568627451, 0.63921568627451, 0.63921568627451)
 				tooltip:SetLineScript(line, "OnMouseUp", NameOnMouseUp, index)
 
 				if toggled then
@@ -533,8 +539,11 @@ do
 					class_color = CLASS_COLORS[player.class] or _G.GRAY_FONT_COLOR
 				end
 				local line = tooltip:AddLine(toggled and ICON_MINUS or ICON_PLUS, " ", player.messages, ByteStr(player.output))
+				tooltip:SetLineColor(line, 0.63921568627451, 0.63921568627451, 0.63921568627451)
+
 				tooltip:SetCell(line, 2, ("%s%s"):format(player_name, player.realm or ""), "LEFT")
 				tooltip:SetCellTextColor(line, 2, class_color.r, class_color.g, class_color.b)
+				tooltip:SetCellColor(line, 3, 0.63921568627451, 0.63921568627451, 0.63921568627451)
 				tooltip:SetLineScript(line, "OnMouseUp", NameOnMouseUp, index)
 
 				if toggled then
@@ -583,11 +592,17 @@ do
 		tooltip:SmartAnchorTo(anchor)
 		tooltip:SetScale(db.tooltip.scale)
 		tooltip:SetCellMarginV(1)
+		tooltip:SetCellMarginH(2)
 
 		local view_mode = db.tooltip.view_mode
 		local line, column = tooltip:AddHeader()
+		tooltip:SetLineColor(line, 0.63921568627451, 0.63921568627451, 0.63921568627451)
 
 		tooltip:SetCell(line, 1, ADDON_NAME .. " - " .. (VIEW_MODES[view_mode] or VIEW_MODES.PLAYER), "CENTER", NUM_COLUMNS)
+		tooltip:SetCellColor(line, 3, 0.63921568627451, 0.63921568627451, 0.63921568627451)
+		tooltip:SetCellTextColor(line, 1, _G.NORMAL_FONT_COLOR.r, _G.NORMAL_FONT_COLOR.g, _G.NORMAL_FONT_COLOR.b)
+		tooltip:SetCellTextColor(line, 4, _G.NORMAL_FONT_COLOR.r, _G.NORMAL_FONT_COLOR.g, _G.NORMAL_FONT_COLOR.b)
+
 		tooltip:AddSeparator()
 		tooltip:AddSeparator()
 
@@ -613,6 +628,9 @@ do
 		tooltip:SetCellScript(line, 3, "OnMouseUp", SortOnMouseUp, "messages")
 		tooltip:SetCellScript(line, 4, "OnMouseUp", SortOnMouseUp, "bytes")
 
+		tooltip:AddSeparator()
+		tooltip:AddSeparator()
+
 		local sort_funcs = SORT_FUNC_TABLES[view_mode] or SORT_FUNC_TABLES.PLAYER
 		local sort_method = db.tooltip.sorting
 
@@ -625,12 +643,6 @@ do
 		channel_iter = nil
 
 		BODY_DRAW_FUNCTIONS[view_mode](sort_method)
-		tooltip:AddLine(" ")
-
-		elapsed_line = tooltip:AddLine()
-		tooltip:SetCell(elapsed_line, 1, _G.TIME_ELAPSED, "LEFT", 3)
-
-		Spamalyzer:UpdateElapsed(timers.elapsed_update)
 
 		if db.tooltip.show_stats then
 			tooltip:AddSeparator()
@@ -643,6 +655,13 @@ do
 				tooltip:SetCell(line, 1, name, "LEFT", 2)
 			end
 		end
+		tooltip:AddSeparator()
+		tooltip:AddSeparator()
+
+		elapsed_line = tooltip:AddLine()
+		tooltip:SetCell(elapsed_line, 1, _G.TIME_ELAPSED, "LEFT", 3)
+
+		Spamalyzer:UpdateElapsed(timers.elapsed_update)
 
 		if not db.tooltip.hide_hint then
 			tooltip:AddSeparator()
