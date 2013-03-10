@@ -201,20 +201,26 @@ end -- do
 do
 	local last_update = 0
 
+	local function Cleanup()
+		Spamalyzer:CancelTimer(timers.tooltip_update)
+		Spamalyzer:CancelTimer(timers.elapsed_update)
+
+		timers.tooltip_update = nil
+		timers.elapsed_update = nil
+
+		tooltip = LQT:Release(tooltip)
+		LDB_anchor = nil
+		elapsed_line = nil
+		last_update = 0
+	end
+
 	function Spamalyzer:UpdateTooltip()
 		last_update = last_update + 1
 
 		-- Check for tooltip visibility as well, since DockingStation 0.3.3 (and a few versions below)
 		-- handles tooltip hiding _way_ too aggressively.
 		if not tooltip or not tooltip:IsVisible() then
-			self:CancelTimer(timers.tooltip_update)
-			self:CancelTimer(timers.elapsed_update)
-
-			timers.tooltip_update = nil
-			timers.elapsed_update = nil
-			LDB_anchor = nil
-			elapsed_line = nil
-			last_update = 0
+			Cleanup()
 			return
 		end
 
@@ -224,15 +230,7 @@ do
 			local elapsed = last_update * 0.2
 
 			if elapsed >= db.tooltip.timer then
-				self:CancelTimer(timers.tooltip_update)
-				self:CancelTimer(timers.elapsed_update)
-
-				timers.tooltip_update = nil
-				timers.elapsed_update = nil
-				tooltip = LQT:Release(tooltip)
-				LDB_anchor = nil
-				elapsed_line = nil
-				last_update = 0
+				Cleanup()
 			end
 		end
 	end
@@ -565,6 +563,8 @@ do
 	}
 
 	function DrawTooltip(anchor)
+		elapsed_line = nil
+
 		if not anchor then
 			return
 		end
@@ -982,7 +982,6 @@ function Spamalyzer:OnEnable()
 					activity.messages = 0
 
 					epoch = GetTime()
-					elapsed_line = nil
 					DrawTooltip(display)
 					UpdateDataFeed()
 				else
@@ -994,7 +993,6 @@ function Spamalyzer:OnEnable()
 				local cur_val = VIEW_MODE_TO_INDEX[db.tooltip.view_mode]
 				db.tooltip.view_mode = INDEX_TO_VIEW_MODE[(cur_val == 3) and 1 or cur_val + 1]
 
-				elapsed_line = nil
 				DrawTooltip(display)
 			end
 		end,
