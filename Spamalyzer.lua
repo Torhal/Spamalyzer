@@ -632,7 +632,7 @@ do
 		tooltip:AddSeparator()
 
 		local sort_funcs = SORT_FUNC_TABLES[view_mode] or SORT_FUNC_TABLES.PLAYER
-		local sort_method = db.tooltip.sorting
+		local sort_method = _G.type(db.tooltip.sorting) == "string" and db.tooltip.sorting or "name"
 
 		if #sort_table > 1 then
 			table.sort(sort_table, sort_funcs[sort_method] or sort_funcs.name)
