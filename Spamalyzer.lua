@@ -287,11 +287,17 @@ do
 				addon_a, addon_b = addons[a], addons[b]
 			end
 
-			if addon_a.output == addon_b.output then
-				if db.tooltip.sort_ascending then
-					return a < b
+			if addon_a and addon_b then
+				if addon_a.output == addon_b.output then
+					if db.tooltip.sort_ascending then
+						return a < b
+					end
+					return a > b
 				end
-				return a > b
+			elseif not addon_a then
+				return db.tooltip.sort_ascending and true or false
+			elseif not addon_b then
+				return not db.tooltip.sort_ascending and true or false
 			end
 
 			if db.tooltip.sort_ascending then
