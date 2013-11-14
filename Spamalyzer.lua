@@ -750,12 +750,11 @@ do
 		if bytes == 0 then
 			return
 		end
-		addon_name = addon_name or prefix -- Ensure that addon_name is not nil.
-
+		local is_known = addon_name
 		local player_name, realm = string.split("-", origin, 2)
 
-		-- If the player is on the current realm, player_name will be nil - set it as origin.
-		player_name = player_name or origin
+		addon_name = addon_name or prefix -- Ensure that addon_name is not nil.
+		player_name = player_name or origin -- If the player is on the current realm, player_name will be nil - set it as origin.
 
 		local player = players[player_name]
 
@@ -769,7 +768,7 @@ do
 					[addon_name] = {
 						messages = 1,
 						output = bytes,
-						known = addon_name and true or false,
+						known = is_known,
 					}
 				}
 			}
@@ -788,7 +787,7 @@ do
 
 			if not source then
 				source = {
-					known = addon_name and true or false,
+					known = is_known,
 					messages = 0,
 					output = 0,
 				}
@@ -807,7 +806,7 @@ do
 			addon = {
 				messages = 1,
 				output = bytes,
-				known = addon_name and true or false,
+				known = is_known,
 				name = addon_name,
 				sorted = {},
 				players = {
@@ -840,7 +839,7 @@ do
 					[addon_name] = {
 						messages = 1,
 						output = bytes,
-						known = addon_name and true or false,
+						known = is_known,
 					}
 				}
 			}
@@ -852,7 +851,7 @@ do
 
 			if not source then
 				source = {
-					known = addon_name and true or false,
+					known = is_known,
 					messages = 0,
 					output = 0,
 				}
@@ -886,7 +885,7 @@ end --do
 -- Hooked functions.
 -------------------------------------------------------------------------------
 function Spamalyzer:SendAddonMessage(prefix, message, type, target)
-	-- Only gather messages we send to the whiper channel, because we'll catch everything else.
+	-- Only gather messages we send to the whisper channel, because we'll catch everything else.
 	if target and target ~= "" and type == "WHISPER" then
 		self:StoreMessage(prefix, message, type, MY_NAME, target)
 	end
