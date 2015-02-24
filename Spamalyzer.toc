@@ -1,4 +1,4 @@
-## Interface: 50400
+## Interface: 60100
 ## Title: Spamalyzer
 ## Notes: Tracks SendAddonMessage Spam
 ## Author: Torhal, Yoshimo
