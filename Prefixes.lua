@@ -12,6 +12,7 @@ namespace.matched_prefixes = MATCHED_PREFIXES
 
 -- These prefixes are full matches.
 local KNOWN_PREFIXES = {
+	["_AMR"]					= "AskMrRobot",
 	[")\252$"]					= "AceComm [VersionCheck]",	-- Hash of "Version". VersionChecker also uses
 	[".\136="]					= "Proximo",
 	["2\224\237"]					= "Cartographer [Guild Positions]",
@@ -254,6 +255,7 @@ local KNOWN_PREFIXES = {
 	["NECBCHAT"]					= "Natur EnemyCastBar",
 	["NECBCTRA"]					= "Natur EnemyCastBar",
 	["Nurfed:Lyt"]					= "Nurfed Layout",
+	["OpenRaid"]					= "OpenRaid",
 	["Ovale"]					= "Ovale",
 	["OQ"]						= "oQueue",
 	["PAB935ndd8xid"]				= "Party Ability Bars",
