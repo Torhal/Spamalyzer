@@ -374,65 +374,80 @@ do
 			if db.tooltip.sort_ascending then
 				return a < b
 			end
+
 			return a > b
 		end,
 		bytes = function(a, b)
-			local player_a, player_b = players[a], players[b]
+			local playerOne, playerTwo = players[a], players[b]
 
 			if addon_iter then
-				if player_a.addons[addon_iter].output == player_b.addons[addon_iter].output then
+				local addonOneOutput = playerOne.addons[addon_iter] and playerOne.addons[addon_iter].output or nil
+				local addonTwoOutput = playerTwo.addons[addon_iter] and playerTwo.addons[addon_iter].output or nil
+
+				if addonOneOutput == addonTwoOutput then
 					if db.tooltip.sort_ascending then
 						return a < b
 					end
+
 					return a > b
 				end
 
 				if db.tooltip.sort_ascending then
-					return player_a.addons[addon_iter].output < player_b.addons[addon_iter].output
+					return addonOneOutput < addonTwoOutput
 				end
-				return player_a.addons[addon_iter].output > player_b.addons[addon_iter].output
+
+				return addonOneOutput > playerTwo.Output
 			end
 
-			if player_a.output == player_b.output then
+			if playerOne.output == playerTwo.output then
 				if db.tooltip.sort_ascending then
 					return a < b
 				end
+
 				return a > b
 			end
 
 			if db.tooltip.sort_ascending then
-				return player_a.output < player_b.output
+				return playerOne.output < playerTwo.output
 			end
-			return player_a.output > player_b.output
+
+			return playerOne.output > playerTwo.output
 		end,
 		messages = function(a, b)
-			local player_a, player_b = players[a], players[b]
+			local playerOne, playerTwo = players[a], players[b]
 
 			if addon_iter then
-				if player_a.addons[addon_iter].messages == player_b.addons[addon_iter].messages then
+				local addonOneMessages = playerOne.addons[addon_iter] and playerOne.addons[addon_iter].messages or nil
+				local addonTwoMessages = playerTwo.addons[addon_iter] and playerTwo.addons[addon_iter].messages or nil
+
+				if addonOneMessages == addonTwoMessages then
 					if db.tooltip.sort_ascending then
 						return a < b
 					end
+
 					return a > b
 				end
 
 				if db.tooltip.sort_ascending then
-					return player_a.addons[addon_iter].messages < player_b.addons[addon_iter].messages
+					return addonOneMessages < addonTwoMessages
 				end
-				return player_a.addons[addon_iter].messages > player_b.addons[addon_iter].messages
+
+				return addonOneMessages > addonTwoMessages
 			end
 
-			if player_a.messages == player_b.messages then
+			if playerOne.messages == playerTwo.messages then
 				if db.tooltip.sort_ascending then
 					return a < b
 				end
+
 				return a > b
 			end
 
 			if db.tooltip.sort_ascending then
-				return player_a.messages < player_b.messages
+				return playerOne.messages < playerTwo.messages
 			end
-			return player_a.messages > player_b.messages
+
+			return playerOne.messages > playerTwo.messages
 		end,
 	}
 
